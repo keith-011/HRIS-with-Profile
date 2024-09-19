@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* @font-face {
+  font-family: "Roboto";
+  src: url("../fonts/Roboto-Regular.ttf") format("truetype");
+  font-weight: 100;
+} */
+
+:root {
+  font-family: "Roboto", system-ui, Helvetica, Arial, sans-serif;
+  color: #212529;
+  /* font-size: 14px; */
+
+  /* font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; */
+}
+
+input[type="password"]::placeholder {
+  font-size: 0.875rem;
+}
+
+/*
+@font-face {
+  font-family: "password";
+  src: local("Arial");
+  unicode-range: U+25CF;
+} */
