@@ -38,7 +38,7 @@ const DashboardLayout: React.FC = () => {
     <>
       <div className="flex h-screen flex-col bg-accent-100">
         <Header updateNavbarStatus={updateNavbarStatus} />
-        <div className="relative flex h-screen">
+        <div className="relative flex h-full overflow-hidden">
           <Sidebar
             isMobileScreen={isMobile}
             isNavbarOpen={navbarStatus}

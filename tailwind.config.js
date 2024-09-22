@@ -3,7 +3,7 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      transitionProperty: { sidebar: "width, transform" },
+      transitionProperty: { sidebar: "width, transform", width: "width" },
       colors: {
         "forest-100": "#83D898",
         "forest-200": "#45C465",

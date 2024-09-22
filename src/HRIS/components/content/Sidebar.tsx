@@ -1,13 +1,14 @@
+import { useState } from "react";
+
+import SidebarButton from "../../../Shared/components/ui/button/SidebarButton";
+import SidebarSeparator from "../../../Shared/components/ui/SidebarSeparator";
+import SidebarDropdown from "../../../Shared/components/ui/button/SidebarDropdown";
+
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import MapsHomeWorkOutlinedIcon from "@mui/icons-material/MapsHomeWorkOutlined";
 import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-
-import SidebarButton from "../../../Shared/components/ui/button/SidebarButton";
-import SidebarSeparator from "../../../Shared/components/ui/SidebarSeparator";
-import { useState } from "react";
-import SidebarDropdown from "../../../Shared/components/ui/button/SidebarDropdown";
 
 interface Props {
   isMobileScreen: boolean;
@@ -28,11 +29,11 @@ const Sidebar: React.FC<Props> = ({
 
   return (
     <>
-      <div
-        className={`transition-sidebar relative duration-300 max-lg:absolute max-lg:bottom-0 max-lg:top-0 max-lg:z-40 ${!isMobileScreen && !isNavbarOpen ? "w-[3.25rem]" : "w-sidebar"} ${isMobileScreen && !isNavbarOpen && "max-lg:-translate-x-full"}`}
+      <nav
+        className={`relative transition-sidebar duration-300 max-lg:absolute max-lg:bottom-0 max-lg:top-0 max-lg:z-40 ${!isMobileScreen && !isNavbarOpen ? "w-[3.25rem]" : "w-sidebar"} ${isMobileScreen && !isNavbarOpen && "max-lg:-translate-x-full"}`}
       >
-        <nav
-          className={`group/separator h-full w-full overflow-y-auto overflow-x-hidden bg-accent-900 transition-[width] duration-300 ${!isMobileScreen && !isNavbarOpen && "hover:w-sidebar"}`}
+        <div
+          className={`group/separator transition-width h-full w-full overflow-y-auto overflow-x-hidden bg-accent-900 duration-300 ${!isMobileScreen && !isNavbarOpen && "hover:w-sidebar"}`}
         >
           <ul className="flex flex-col items-start pt-4">
             <SidebarSeparator
@@ -121,8 +122,8 @@ const Sidebar: React.FC<Props> = ({
               ]}
             />
           </ul>
-        </nav>
-      </div>
+        </div>
+      </nav>
 
       {/* Mobile Black Screen */}
       {isMobileScreen && isNavbarOpen && (
