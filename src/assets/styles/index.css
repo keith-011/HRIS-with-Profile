@@ -2,11 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+.table {
+  @apply w-full divide-y divide-accent-300 whitespace-nowrap border-y border-accent-300 text-accent-900;
+}
+
+.table-body {
+  @apply divide-y divide-accent-300 text-sm;
+}
+.table-data {
+  @apply h-table-cell px-6;
+}
+
 /* @font-face {
   font-family: "Roboto";
   src: url("../fonts/Roboto-Regular.ttf") format("truetype");
   font-weight: 100;
 } */
+
+.grab::-webkit-scrollbar {
+  height: 1px;
+  width: 1px;
+}
 
 :root {
   font-family: "Roboto", system-ui, Helvetica, Arial, sans-serif;
@@ -23,6 +39,24 @@ input[type="password"]::placeholder {
   font-size: 0.875rem;
 }
 
+.scrollable::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+.scrollable::-webkit-scrollbar-track {
+  /* background: #fdfdfd; */
+  border-radius: 4px;
+}
+
+/* Handle */
+.scrollable::-webkit-scrollbar-thumb {
+  background: #99a2a5;
+  border-radius: 999px;
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background: #667479;
+}
 /*
 @font-face {
   font-family: "password";

@@ -6,9 +6,10 @@ import SidebarDropdown from "../../../Shared/components/ui/button/SidebarDropdow
 
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
-import MapsHomeWorkOutlinedIcon from "@mui/icons-material/MapsHomeWorkOutlined";
 import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import GroupWorkOutlinedIcon from "@mui/icons-material/GroupWorkOutlined";
+import WorkspacesOutlinedIcon from "@mui/icons-material/WorkspacesOutlined";
 
 interface Props {
   isMobileScreen: boolean;
@@ -16,7 +17,7 @@ interface Props {
   updateNavbarStatus: () => void;
 }
 
-const Sidebar: React.FC<Props> = ({
+const DashboardSidebar: React.FC<Props> = ({
   isMobileScreen,
   isNavbarOpen,
   updateNavbarStatus,
@@ -30,10 +31,10 @@ const Sidebar: React.FC<Props> = ({
   return (
     <>
       <nav
-        className={`relative transition-sidebar duration-300 max-lg:absolute max-lg:bottom-0 max-lg:top-0 max-lg:z-40 ${!isMobileScreen && !isNavbarOpen ? "w-[3.25rem]" : "w-sidebar"} ${isMobileScreen && !isNavbarOpen && "max-lg:-translate-x-full"}`}
+        className={`relative transition-sidebar duration-300 max-lg:absolute max-lg:bottom-0 max-lg:top-0 max-lg:z-50 ${isMobileScreen && !isNavbarOpen && "max-lg:-translate-x-full"} ${!isMobileScreen && !isNavbarOpen ? "w-[3.25rem]" : "w-sidebar"}`}
       >
         <div
-          className={`group/separator transition-width h-full w-full overflow-y-auto overflow-x-hidden bg-accent-900 duration-300 ${!isMobileScreen && !isNavbarOpen && "hover:w-sidebar"}`}
+          className={`group/separator scrollable overflow-x-hidden bg-accent-900 transition-width duration-300 ${!isMobileScreen && !isNavbarOpen ? "absolute bottom-0 top-0 w-[3.25rem] hover:w-sidebar" : "h-full w-sidebar"}`}
         >
           <ul className="flex flex-col items-start pt-4">
             <SidebarSeparator
@@ -59,8 +60,13 @@ const Sidebar: React.FC<Props> = ({
             />
             <SidebarButton
               link="departments"
-              Icon={MapsHomeWorkOutlinedIcon}
+              Icon={GroupWorkOutlinedIcon}
               text="Departments"
+            />
+            <SidebarButton
+              link="divisions"
+              Icon={WorkspacesOutlinedIcon}
+              text="Divisions"
             />
 
             <SidebarSeparator
@@ -138,4 +144,4 @@ const Sidebar: React.FC<Props> = ({
   );
 };
 
-export default Sidebar;
+export default DashboardSidebar;

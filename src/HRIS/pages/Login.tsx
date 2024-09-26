@@ -39,7 +39,11 @@ const Login = () => {
               Forgot Password?
             </NavLink>
 
-            <DefaultButton text="Sign In" handleClick={onLogin} />
+            <DefaultButton
+              text="Sign In"
+              handleClick={onLogin}
+              className="bg-forest-800 hover:bg-forest-900"
+            />
           </div>
         </div>
       </div>

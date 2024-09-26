@@ -1,65 +1,67 @@
 import PageHeader from "../components/content/PageHeader";
-import TableHeader from "../components/ui/TableHeader";
+import useTableProperties from "../../hooks/useTableProperties";
 import TableRecordPerPage from "../components/ui/TableRecordPerPage";
-
+import TableHeader from "../components/ui/TableHeader";
 import Avatar1 from "/src/assets/images/Avatar.png";
 
-import TablePagination from "../components/ui/TablePagination";
-import useTableProperties from "../../hooks/useTableProperties";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useModalContext } from "../context/HRISContext";
-import AddDepartment from "../components/modals/AddDepartment";
+import TablePagination from "../components/ui/TablePagination";
 
-const Department = () => {
-  const { openModal } = useModalContext();
+const Division = () => {
   const breadcrumbs = [
     { text: "Dashboard", link: "/dashboard" },
-    { text: "Departments", link: "/departments" },
+    { text: "Divisions", link: "/division" },
   ];
 
   const tableHeader = [
+    { id: "division", text: "Division" },
+    { id: "division_head", text: "Division Head" },
     { id: "department", text: "Department" },
-    { id: "head", text: "Department Head" },
-    { id: "division", text: "Divisions" },
     { id: "action", text: "Action" },
   ];
 
   const tableData = [
     {
       id: "1",
-      department: "Business Development",
-      head: "Isabella Gray",
-      division: 0,
+      division: "Parent and Community Outreach Division",
+      division_head: "Delone Iarch",
+      department: "Guidance and Counseling Services",
     },
     {
       id: "2",
+      division: "Career Counseling Division",
+      division_head: "Tricia De Leon",
       department: "Guidance and Counseling Services",
-      head: "Mason Reed",
-      division: 3,
     },
     {
       id: "3",
-      department: "General Education",
-      head: "Harper Collins",
-      division: 0,
+      division: "Risk Assessment and Management Division",
+      division_head: "Bruno Lockhart",
+      department: "Safety and Security Management Office",
     },
     {
       id: "4",
-      department: "Center for Information  Management and Technical Support",
-      head: "Jameson Clark",
-      division: 4,
+      division: "Health and Safety Division",
+      division_head: "Bruno Lockhart",
+      department: "Safety and Security Management Office",
     },
     {
       id: "5",
-      department: "Safety and Security Management Office",
-      head: "Lily Morris",
-      division: 2,
+      division: "IT Support Division",
+      division_head: "Ian Calleu",
+      department: "Center for Information  Management and Technical Support",
     },
     {
       id: "6",
-      department: "Information Resource Center",
-      head: "Alexander King",
-      division: 0,
+      division: "Technology Integration Division",
+      division_head: "Victor Galleo",
+      department: "Center for Information  Management and Technical Support",
+    },
+    {
+      id: "7",
+      division: "Network Administration Division",
+      division_head: "Francis Cordello",
+      department: "Center for Information  Management and Technical Support",
     },
   ];
 
@@ -76,19 +78,18 @@ const Department = () => {
   return (
     <>
       <PageHeader
-        header="Departments"
-        importFunction={() => {}}
-        exportFunction={() => {}}
-        buttonText="Add Department"
-        buttonFunction={() => {
-          openModal({
-            header: "Add Department",
-            subheading:
-              "Add a new department by entering the required information here",
-            content: <AddDepartment />,
-          });
-        }}
+        header="Divisions"
         breadcrumbs={breadcrumbs}
+        exportFunction={() => {
+          // TO DO
+        }}
+        importFunction={() => {
+          // TO DO
+        }}
+        buttonText="Add Division"
+        buttonFunction={() => {
+          // TO DO
+        }}
       />
 
       <div className="flex flex-col gap-3">
@@ -112,17 +113,17 @@ const Department = () => {
                   className={`${index % 2 == 0 ? "bg-accent-150" : "bg-accent-50"}`}
                 >
                   {/* Standard Cells */}
-                  <td className="table-data">{item.department}</td>
+                  <td className="table-data">{item.division}</td>
                   {/* For cells with images */}
                   <td className="table-data">
                     <div className="flex items-center gap-3">
                       <div className="max-h-8 min-h-8 min-w-8 max-w-8 shrink-0 overflow-hidden rounded-full">
                         <img src={Avatar1} className="object-cover" />
                       </div>
-                      <span>{item.head}</span>
+                      <span>{item.division_head}</span>
                     </div>
                   </td>
-                  <td className="table-data">{item.division}</td>
+                  <td className="table-data">{item.department}</td>
                   {/* Action Cells */}
                   <td className="table-data flex items-center justify-center">
                     <button>
@@ -147,4 +148,4 @@ const Department = () => {
   );
 };
 
-export default Department;
+export default Division;

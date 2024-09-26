@@ -1,8 +1,10 @@
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-import Header from "../components/content/Header";
-import Sidebar from "../components/content/Sidebar";
+import DashboardHeader from "../components/content/DashboardHeader";
+import DashboardSidebar from "../components/content/DashboardSidebar";
+import ModalBase from "../components/modals/ModalBase";
+import { ModalContextProvider } from "../context/HRISContext";
 
 const DashboardLayout: React.FC = () => {
   const [isMobile, isMobileScreen] = useState<boolean>(true);
@@ -36,19 +38,22 @@ const DashboardLayout: React.FC = () => {
 
   return (
     <>
-      <div className="flex h-screen flex-col bg-accent-100">
-        <Header updateNavbarStatus={updateNavbarStatus} />
-        <div className="relative flex h-full overflow-hidden">
-          <Sidebar
-            isMobileScreen={isMobile}
-            isNavbarOpen={navbarStatus}
-            updateNavbarStatus={updateNavbarStatus}
-          />
-          <div className="p-6">
-            <Outlet />
+      <ModalContextProvider>
+        <div className="relative flex h-screen flex-col overflow-hidden bg-accent-100">
+          <ModalBase />
+          <DashboardHeader updateNavbarStatus={updateNavbarStatus} />
+          <div className="relative flex flex-1 overflow-hidden">
+            <DashboardSidebar
+              isMobileScreen={isMobile}
+              isNavbarOpen={navbarStatus}
+              updateNavbarStatus={updateNavbarStatus}
+            />
+            <div className="flex-1 overflow-y-auto p-6">
+              <Outlet />
+            </div>
           </div>
         </div>
-      </div>
+      </ModalContextProvider>
     </>
   );
 };

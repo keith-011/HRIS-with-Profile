@@ -3,7 +3,10 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      transitionProperty: { sidebar: "width, transform", width: "width" },
+      transitionProperty: {
+        sidebar: "width, transform",
+        width: "width",
+      },
       colors: {
         "forest-100": "#83D898",
         "forest-200": "#45C465",
@@ -40,6 +43,7 @@ export default {
         navbar: "4.125rem",
         sidebar: "16.8125rem",
         "sidebar-padding": "18.3125rem",
+        "table-cell": "3.5rem",
       },
     },
   },

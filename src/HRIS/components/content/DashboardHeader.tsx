@@ -11,10 +11,10 @@ interface Props {
   updateNavbarStatus: () => void;
 }
 
-const Header: React.FC<Props> = ({ updateNavbarStatus }) => {
+const DashboardHeader: React.FC<Props> = ({ updateNavbarStatus }) => {
   return (
     <>
-      <header className="relative flex h-navbar items-center justify-center bg-gradient-to-r from-[#329D4D] to-[#45C465]">
+      <header className="relative flex h-navbar shrink-0 items-center justify-center bg-gradient-to-r from-[#329D4D] to-[#45C465]">
         <div className="absolute flex items-center gap-3 lg:left-6">
           <img
             src={PCCLogo}
@@ -59,4 +59,4 @@ const Header: React.FC<Props> = ({ updateNavbarStatus }) => {
   );
 };
 
-export default Header;
+export default DashboardHeader;

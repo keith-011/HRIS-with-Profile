@@ -6,6 +6,8 @@ interface Props {
   Icon?: SvgIconComponent;
   className?: string;
   handleClick: () => void;
+  formId?: string;
+  type?: "button" | "submit";
 }
 
 const DefaultButton: React.FC<Props> = ({
@@ -13,13 +15,16 @@ const DefaultButton: React.FC<Props> = ({
   className,
   Icon,
   handleClick: onClick,
+  formId: id,
+  type = "button",
 }) => {
   return (
     <>
       <button
-        type="button"
+        type={type}
+        form={id}
         className={twMerge(
-          "flex w-full justify-center gap-1 rounded bg-forest-800 px-3 py-2 font-medium text-accent-50 transition-colors hover:bg-forest-900",
+          "flex w-full justify-center gap-1 rounded px-3 py-2 font-medium text-accent-50 transition-colors",
           className,
         )}
         onClick={onClick}
