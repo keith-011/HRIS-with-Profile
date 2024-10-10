@@ -1,23 +1,40 @@
 import DownloadIcon from "@mui/icons-material/Download";
 import UploadIcon from "@mui/icons-material/Upload";
 import AddIcon from "@mui/icons-material/Add";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const Dashboard = () => {
+  interface FormData {
+    firstName: string;
+  }
+
+  const schema = z.object({
+    firstName: z.any(),
+  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = (data: FormData) => {
+    console.log(data);
+  };
+
   return (
-    <>
-      {/* <div className="flex justify-between gap-2 max-md:flex-col md:gap-3">
-        <Header heading="Employee" subHeading="Dashboard / Employee" />
-        <div className="flex gap-3 max-md:flex-col">
-          <div className="flex gap-3 max-md:order-2">
-            <Buttons id="btn1" Icon={DownloadIcon} text="Import" />
-            <Buttons id="btn2" Icon={UploadIcon} text="Export" />
-          </div>
-          <div className="max-md:order-1">
-            <Buttons Icon={AddIcon} text="Add Employee" isRounded={true} />
-          </div>
-        </div>
-      </div> */}
-    </>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div>
+        <label htmlFor="firstName">First Name</label>
+        <input type="file" {...register("firstName")} />
+        {errors.firstName && <p>{errors.firstName.message}</p>}
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
   );
 };
 

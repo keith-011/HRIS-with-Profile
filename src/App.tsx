@@ -5,17 +5,22 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-import Login from "./HRIS/pages/Login";
+import { Slide, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 import DashboardLayout from "./HRIS/layouts/DashboardLayout";
 
+import Login from "./HRIS/pages/Login";
 import Forgot from "./HRIS/pages/Forgot";
 import Dashboard from "./HRIS/pages/Dashboard";
 import Employee from "./HRIS/pages/Employee";
 import Department from "./HRIS/pages/Department";
-
 import Division from "./HRIS/pages/Division";
 import Profile from "./HRIS/pages/Profile";
+import TestingTable from "./HRIS/pages/TestingTable";
+
+axios.defaults.baseURL = "http://localhost:3000";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,14 +29,14 @@ const router = createBrowserRouter(
       <Route path="forgot" element={<Forgot />} />
 
       <Route element={<DashboardLayout />}>
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="dashboard" element={<TestingTable />} />
         <Route path="employees" element={<Employee />} />
         <Route path="departments" element={<Department />} />
         <Route path="divisions" element={<Division />} />
 
         <Route path="profile/:id" element={<Profile />} />
       </Route>
-      {/* <Route path="testing" element={<TESTINGROUTE />} /> */}
+      <Route path="testing" element={<TestingTable />} />
     </Route>,
   ),
 );
@@ -40,6 +45,16 @@ const App = () => {
   return (
     <>
       <RouterProvider router={router} />
+      <ToastContainer
+        autoClose={1500}
+        position="top-center"
+        transition={Slide}
+        limit={3}
+        closeOnClick={true}
+        pauseOnHover={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+      />
     </>
   );
 };

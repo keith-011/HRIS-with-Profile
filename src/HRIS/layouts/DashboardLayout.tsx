@@ -39,7 +39,7 @@ const DashboardLayout: React.FC = () => {
   return (
     <>
       <ModalContextProvider>
-        <div className="relative flex h-screen flex-col overflow-hidden bg-accent-100">
+        <div className="flex h-screen flex-col overflow-hidden bg-accent-100">
           <ModalBase />
           <DashboardHeader updateNavbarStatus={updateNavbarStatus} />
           <div className="relative flex flex-1 overflow-hidden">

@@ -16,7 +16,8 @@ const TablePagination: React.FC<Props> = ({
   recordPerPage,
 }) => {
   const dataLength = tableData.length;
-  const startIndex = (currentPage - 1) * recordPerPage + 1;
+  const startIndex =
+    currentPage !== 0 ? (currentPage - 1) * recordPerPage + 1 : 0;
   const endIndex = Math.min(currentPage * recordPerPage, dataLength);
 
   return (

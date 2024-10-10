@@ -1,11 +1,12 @@
 import { UseFormRegisterReturn } from "react-hook-form";
-import { SelectIdDescription } from "../../../../utils/Globals";
+import { DepartmentTable } from "../../../../utils/Globals";
 
 interface Props {
   register: UseFormRegisterReturn;
-  data: SelectIdDescription[];
+  data: DepartmentTable[];
 }
-const DefaultDropdown: React.FC<Props> = ({ register, data }) => {
+
+const SelectDepartmentHead: React.FC<Props> = ({ register, data }) => {
   return (
     <>
       {/* TO DO */}
@@ -17,7 +18,9 @@ const DefaultDropdown: React.FC<Props> = ({ register, data }) => {
         {data.length > 0 &&
           data.map((item) => (
             <option key={item.id} value={item.id}>
-              {item.description}
+              {item.department_head == null
+                ? `${item.department} (No head)`
+                : item.department}
             </option>
           ))}
       </select>
@@ -25,4 +28,4 @@ const DefaultDropdown: React.FC<Props> = ({ register, data }) => {
   );
 };
 
-export default DefaultDropdown;
+export default SelectDepartmentHead;

@@ -1,16 +1,18 @@
-import Avatar1 from "/src/assets/images/Avatar.png";
-
 import { useModalContext } from "../context/HRISContext";
 
-import PageHeader from "../components/content/PageHeader";
-import AddEmployee from "../components/modals/AddEmployee";
-import TableHeader from "../components/ui/TableHeader";
+import Table from "../../Shared/components/ui/layout/Table";
+import TableRow from "../../Shared/components/ui/layout/TableRow";
 
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import PageHeader from "../components/content/PageHeader";
+import TableHeader from "../components/ui/table/TableHeader";
 import TableRecordPerPage from "../components/ui/TableRecordPerPage";
 import TablePagination from "../components/ui/TablePagination";
+import TableData from "../components/ui/table/TableData";
+
 import useTableProperties from "../../hooks/useTableProperties";
+
 import { validateHeaders } from "../../utils/Functions";
+import AddEmployee from "../components/modals/AddEmployee";
 
 const Employee = () => {
   const { openModal } = useModalContext();
@@ -21,17 +23,18 @@ const Employee = () => {
   ];
 
   const tableHeader = [
-    { id: "name", text: "Name" },
-    { id: "employee_number", text: "Employee Number" },
-    { id: "email", text: "Email" },
-    { id: "plantilla", text: "Designation (Plantilla)" },
-    { id: "designation", text: "Designation (PCC)" },
-    { id: "action", text: "Action" },
+    { id: "employee_number", text: "Employee Number", width: "w-[10%]" },
+    { id: "name", text: "Name", width: "w-[15%]" },
+    { id: "email", text: "Email", width: "w-[20%]" },
+    { id: "plantilla", text: "Designation (Plantilla)", width: "w-[25%]" },
+    { id: "designation", text: "Designation (PCC)", width: "w-[25%]" },
+    { id: "action", text: "Action", width: "w-[5%]" },
   ];
 
   const tableData = [
     {
       id: "1",
+      image_url: "/src/assets/images/Avatar.png",
       name: "Isabella Gray",
       employee_number: "2020-00096-PQ-0",
       email: "sample@gmail.com",
@@ -40,14 +43,16 @@ const Employee = () => {
     },
     {
       id: "2",
+      image_url: "/src/assets/images/Avatar.png",
       name: "Isabella Gray",
       employee_number: "2020-00097-PQ-0",
       email: "sample@gmails.com",
-      plantilla: "Associate Professor I",
+      plantilla: "Associate Professor eI",
       designation: "Local Human Resource Management Office",
     },
     {
       id: "3",
+      image_url: "/src/assets/images/Avatar.png",
       name: "Isabella Gray",
       employee_number: "2020-00098-PQ-0",
       email: "sample@gmail.com",
@@ -56,6 +61,7 @@ const Employee = () => {
     },
     {
       id: "4",
+      image_url: "/src/assets/images/Avatar.png",
       name: "Isabella Gray",
       employee_number: "2020-00099-PQ-0",
       email: "sample@gmail.com",
@@ -67,9 +73,9 @@ const Employee = () => {
   validateHeaders(tableHeader, tableData);
 
   const {
-    sortedTableData,
-    onClickHeaderSort,
-    onChangeMaxEntries,
+    sortableTableData,
+    sortColumn,
+    changePagination,
     setCurrentPage,
     totalPage,
     currentPage,
@@ -99,51 +105,39 @@ const Employee = () => {
       />
 
       <div className="flex flex-col gap-3">
-        <TableRecordPerPage onChange={onChangeMaxEntries} />
+        <TableRecordPerPage onChange={changePagination} />
 
-        {/* Table */}
-        <div className="scrollable overflow-x-auto">
-          <table className="table">
-            <thead>
-              <tr>
+        <Table>
+          <thead>
+            <tr>
+              {tableHeader.map((item) => (
                 <TableHeader
-                  tableHeader={tableHeader}
-                  requestSort={onClickHeaderSort}
-                />
-              </tr>
-            </thead>
-            <tbody className="table-body">
-              {sortedTableData.map((item, index) => (
-                <tr
                   key={item.id}
-                  className={`${index % 2 == 0 ? "bg-accent-150" : "bg-accent-50"}`}
-                >
-                  {/* For cells with images */}
-                  <td className="table-data">
-                    <div className="flex items-center gap-3">
-                      <div className="max-h-8 min-h-8 min-w-8 max-w-8 shrink-0 overflow-hidden rounded-full">
-                        <img src={Avatar1} className="object-cover" />
-                      </div>
-                      <span>{item.name}</span>
-                    </div>
-                  </td>
-                  {/* Standard Cells */}
-                  <td className="table-data">{item.employee_number}</td>
-                  <td className="table-data">{item.email}</td>
-                  <td className="table-data">{item.plantilla}</td>
-                  <td className="table-data">{item.designation}</td>
-
-                  {/* Action Cells */}
-                  <td className="table-data flex items-center justify-center">
-                    <button>
-                      <MoreVertIcon />
-                    </button>
-                  </td>
-                </tr>
+                  tableHeader={{
+                    id: item.id,
+                    headerName: item.text,
+                    width: item.width,
+                  }}
+                  onColumnClick={sortColumn}
+                />
               ))}
-            </tbody>
-          </table>
-        </div>
+            </tr>
+          </thead>
+          <tbody className="table-body">
+            {sortableTableData.map((item, index) => (
+              <TableRow key={index} colorIndex={index}>
+                <TableData defaultData={item.employee_number} />
+                <TableData
+                  withImage={{ imagePath: item.image_url, text: item.name }}
+                />
+                <TableData defaultData={item.email} />
+                <TableData defaultData={item.plantilla} />
+                <TableData defaultData={item.designation} />
+                <TableData isAction={true} />
+              </TableRow>
+            ))}
+          </tbody>
+        </Table>
 
         <TablePagination
           tableData={tableData}

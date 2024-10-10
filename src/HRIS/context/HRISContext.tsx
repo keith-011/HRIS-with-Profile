@@ -1,4 +1,3 @@
-import { ModalClassKey } from "@mui/material";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 type ModalContent = {
@@ -11,6 +10,8 @@ interface ModalInterface {
   isModalOpen: boolean;
   openModal: (modalContent: ModalContent) => void;
   closeModal: () => void;
+  refresh: boolean;
+  refreshParentPage: () => void;
   content: ModalContent | null;
 }
 
@@ -32,6 +33,7 @@ export const ModalContextProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [isModalOpen, setModalStatus] = useState<boolean>(false);
   const [content, setContent] = useState<ModalContent | null>(null);
+  const [refresh, setRefresh] = useState<boolean>(false);
 
   const openModal = (modalContent: ModalContent) => {
     setModalStatus(true);
@@ -42,10 +44,21 @@ export const ModalContextProvider: React.FC<{ children: ReactNode }> = ({
     setModalStatus(false);
   };
 
+  const refreshParentPage = () => {
+    setRefresh(!refresh);
+  };
+
   return (
     <>
       <ModalContext.Provider
-        value={{ isModalOpen, closeModal, openModal, content }}
+        value={{
+          isModalOpen,
+          closeModal,
+          openModal,
+          refresh,
+          refreshParentPage,
+          content,
+        }}
       >
         {children}
       </ModalContext.Provider>

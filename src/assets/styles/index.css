@@ -3,14 +3,19 @@
 @tailwind utilities;
 
 .table {
-  @apply w-full divide-y divide-accent-300 whitespace-nowrap border-y border-accent-300 text-accent-900;
+  @apply w-full divide-y divide-accent-300 border-y border-accent-300 text-accent-900;
 }
 
 .table-body {
   @apply divide-y divide-accent-300 text-sm;
 }
-.table-data {
-  @apply h-table-cell px-6;
+
+/* .table-data {
+  @apply px-6;
+} */
+
+.modal-input {
+  @apply w-full rounded border border-accent-200 bg-accent-50 px-3 py-4 focus:border-accent-400 focus:outline-none;
 }
 
 /* @font-face {

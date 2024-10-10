@@ -1,72 +1,56 @@
-import PageHeader from "../components/content/PageHeader";
-import TableHeader from "../components/ui/TableHeader";
-import TableRecordPerPage from "../components/ui/TableRecordPerPage";
-
-import Avatar1 from "/src/assets/images/Avatar.png";
-
-import TablePagination from "../components/ui/TablePagination";
-import useTableProperties from "../../hooks/useTableProperties";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useModalContext } from "../context/HRISContext";
+
+import useTableProperties from "../../hooks/useTableProperties";
+
+import PageHeader from "../components/content/PageHeader";
+import TableHeader from "../components/ui/table/TableHeader";
+import TableRecordPerPage from "../components/ui/TableRecordPerPage";
+import TablePagination from "../components/ui/TablePagination";
 import AddDepartment from "../components/modals/AddDepartment";
+import TableData from "../components/ui/table/TableData";
+import Table from "../../Shared/components/ui/layout/Table";
+import TableRow from "../../Shared/components/ui/layout/TableRow";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { ToastHandleAxiosCatch } from "../../utils/ToastFunctions";
+import TableContainer from "../../Shared/components/ui/layout/TableContainer";
+import TableHead from "../components/ui/table/TableHead";
+import TableBody from "../components/ui/table/TableBody";
+import { useFetchData } from "../../hooks/useFetchData";
+import { ColumnHeader } from "../../utils/Globals";
+
+interface FetchedData {
+  id: string;
+  department: string;
+  head: string;
+  image_path?: string;
+  division_count: number;
+}
 
 const Department = () => {
-  const { openModal } = useModalContext();
   const breadcrumbs = [
     { text: "Dashboard", link: "/dashboard" },
     { text: "Departments", link: "/departments" },
   ];
 
-  const tableHeader = [
-    { id: "department", text: "Department" },
-    { id: "head", text: "Department Head" },
-    { id: "division", text: "Divisions" },
-    { id: "action", text: "Action" },
+  const tableHeader: ColumnHeader[] = [
+    { id: "department", headerName: "Department", width: "w-[40%]" },
+    { id: "head", headerName: "Department Head", width: "w-[30%]" },
+    { id: "division", headerName: "Divisions", width: "w-[25%]" },
+    { id: "action", headerName: "Action", width: "w-[5%]" },
   ];
 
-  const tableData = [
-    {
-      id: "1",
-      department: "Business Development",
-      head: "Isabella Gray",
-      division: 0,
-    },
-    {
-      id: "2",
-      department: "Guidance and Counseling Services",
-      head: "Mason Reed",
-      division: 3,
-    },
-    {
-      id: "3",
-      department: "General Education",
-      head: "Harper Collins",
-      division: 0,
-    },
-    {
-      id: "4",
-      department: "Center for Information  Management and Technical Support",
-      head: "Jameson Clark",
-      division: 4,
-    },
-    {
-      id: "5",
-      department: "Safety and Security Management Office",
-      head: "Lily Morris",
-      division: 2,
-    },
-    {
-      id: "6",
-      department: "Information Resource Center",
-      head: "Alexander King",
-      division: 0,
-    },
-  ];
+  const { openModal, refresh } = useModalContext();
+
+  const { tableData, isError, isLoading } = useFetchData<FetchedData>(
+    "/v1/table/departments",
+    refresh,
+  );
 
   const {
-    sortedTableData,
-    onClickHeaderSort,
-    onChangeMaxEntries,
+    sortableTableData,
+    sortColumn,
+    changePagination,
     setCurrentPage,
     totalPage,
     currentPage,
@@ -77,74 +61,249 @@ const Department = () => {
     <>
       <PageHeader
         header="Departments"
-        importFunction={() => {}}
-        exportFunction={() => {}}
+        importFunction={() => {
+          // TO DO
+        }}
+        exportFunction={() => {
+          // TO DO
+        }}
         buttonText="Add Department"
         buttonFunction={() => {
           openModal({
             header: "Add Department",
             subheading:
-              "Add a new department by entering the required information here",
+              "Add a new department by entering the required information here.",
             content: <AddDepartment />,
           });
         }}
         breadcrumbs={breadcrumbs}
       />
 
-      <div className="flex flex-col gap-3">
-        <TableRecordPerPage onChange={onChangeMaxEntries} />
+      {isLoading && <p>Loading...</p>}
+      {!isLoading && isError && <p>An error ocurred.</p>}
+      {!isLoading && !isError && (
+        <>
+          <div className="flex flex-col gap-3">
+            <TableRecordPerPage onChange={changePagination} />
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow colorIndex={1}>
+                    {tableHeader.map((item) => (
+                      <TableHeader
+                        key={item.id}
+                        tableHeader={{
+                          id: item.id,
+                          headerName: item.headerName,
+                          width: item.width,
+                        }}
+                        onColumnClick={sortColumn}
+                      />
+                    ))}
+                  </TableRow>
+                </TableHead>
+                {!isError ? (
+                  <>
+                    <TableBody>
+                      {sortableTableData.map((item, index) => (
+                        <TableRow key={item.id} colorIndex={index}>
+                          <TableData defaultData={item.department} />
+                          <TableData
+                            withImage={{
+                              imagePath: item.image_path,
+                              text: item.head,
+                            }}
+                          />
+                          <TableData defaultData={item.division_count} />
+                          <TableData isAction={true} />
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </>
+                ) : (
+                  <p>Error fetching data.</p>
+                )}
+              </Table>
+            </TableContainer>
 
-        {/* Table */}
-        <div className="scrollable overflow-x-auto">
-          <table className="table">
-            <thead>
-              <tr>
-                <TableHeader
-                  tableHeader={tableHeader}
-                  requestSort={onClickHeaderSort}
-                />
-              </tr>
-            </thead>
-            <tbody className="table-body">
-              {sortedTableData.map((item, index) => (
-                <tr
-                  key={item.id}
-                  className={`${index % 2 == 0 ? "bg-accent-150" : "bg-accent-50"}`}
-                >
-                  {/* Standard Cells */}
-                  <td className="table-data">{item.department}</td>
-                  {/* For cells with images */}
-                  <td className="table-data">
-                    <div className="flex items-center gap-3">
-                      <div className="max-h-8 min-h-8 min-w-8 max-w-8 shrink-0 overflow-hidden rounded-full">
-                        <img src={Avatar1} className="object-cover" />
-                      </div>
-                      <span>{item.head}</span>
-                    </div>
-                  </td>
-                  <td className="table-data">{item.division}</td>
-                  {/* Action Cells */}
-                  <td className="table-data flex items-center justify-center">
-                    <button>
-                      <MoreVertIcon />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            <TablePagination
+              tableData={tableData}
+              currentPage={currentPage}
+              recordPerPage={recordPerPage}
+              setCurrentPage={setCurrentPage}
+              totalPage={totalPage}
+            />
+          </div>
+        </>
+      )}
 
-        <TablePagination
-          tableData={tableData}
-          currentPage={currentPage}
-          recordPerPage={recordPerPage}
-          setCurrentPage={setCurrentPage}
-          totalPage={totalPage}
-        />
-      </div>
+      {/* {sortableTableData == null && <p>Loading Data.</p>} */}
     </>
   );
 };
 
 export default Department;
+
+// import { useModalContext } from "../context/HRISContext";
+
+// import useTableProperties from "../../hooks/useTableProperties";
+
+// import PageHeader from "../components/content/PageHeader";
+// import TableHeader from "../components/ui/table/TableHeader";
+// import TableRecordPerPage from "../components/ui/TableRecordPerPage";
+// import TablePagination from "../components/ui/TablePagination";
+// import AddDepartment from "../components/modals/AddDepartment";
+// import TableData from "../components/ui/table/TableData";
+// import Table from "../../Shared/components/ui/layout/Table";
+// import TableRow from "../../Shared/components/ui/layout/TableRow";
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+// import { ToastHandleAxiosCatch } from "../../utils/ToastFunctions";
+// import TableContainer from "../../Shared/components/ui/layout/TableContainer";
+// import TableHead from "../components/ui/table/TableHead";
+// import TableBody from "../components/ui/table/TableBody";
+
+// interface FetchedData {
+//   id: string;
+//   department: string;
+//   head: string;
+//   image_url?: string;
+//   division_count: number;
+// }
+
+// const Department = () => {
+//   const breadcrumbs = [
+//     { text: "Dashboard", link: "/dashboard" },
+//     { text: "Departments", link: "/departments" },
+//   ];
+
+//   const tableHeader = [
+//     { id: "department", text: "Department", width: "w-[40%]" },
+//     { id: "head", text: "Department Head", width: "w-[30%]" },
+//     { id: "division", text: "Divisions", width: "w-[25%]" },
+//     { id: "action", text: "Action", width: "w-[5%]" },
+//   ];
+
+//   const [tableData, setTableData] = useState<FetchedData[] | undefined>(
+//     undefined,
+//   );
+//   const [isLoading, setLoading] = useState<boolean>(true);
+//   const [isError, setError] = useState<boolean>(false);
+//   const { openModal, refresh } = useModalContext();
+
+//   useEffect(() => {
+//     (async () => {
+//       const controller = new AbortController();
+//       try {
+//         const fetchData = await axios.get("/v1/departments", {
+//           signal: controller.signal,
+//         });
+//         setTableData(fetchData.data.rows);
+//       } catch (error) {
+//         setError(ToastHandleAxiosCatch(error));
+//       } finally {
+//         setLoading(false);
+//       }
+
+//       return () => {
+//         controller.abort();
+//       };
+//     })();
+//   }, [refresh]);
+
+//   const {
+//     sortableTableData,
+//     sortColumn,
+//     changePagination,
+//     setCurrentPage,
+//     totalPage,
+//     currentPage,
+//     recordPerPage,
+//   } = useTableProperties(tableData);
+
+//   return (
+//     <>
+//       <PageHeader
+//         header="Departments"
+//         importFunction={() => {}}
+//         exportFunction={() => {}}
+//         buttonText="Add Department"
+//         buttonFunction={() => {
+//           openModal({
+//             header: "Add Department",
+//             subheading:
+//               "Add a new department by entering the required information here",
+//             content: <AddDepartment />,
+//           });
+//         }}
+//         breadcrumbs={breadcrumbs}
+//       />
+
+//       {isLoading && <p>Loading...</p>}
+//       {!isLoading && isError && <p>An error ocurred.</p>}
+//       {!isLoading && !isError && (
+//         <>
+//           {sortableTableData && tableData && (
+//             <>
+//               <div className="flex flex-col gap-3">
+//                 <TableRecordPerPage onChange={changePagination} />
+//                 <TableContainer>
+//                   <Table>
+//                     <TableHead>
+//                       <TableRow colorIndex={1}>
+//                         {tableHeader.map((item) => (
+//                           <TableHeader
+//                             key={item.id}
+//                             tableHeader={{
+//                               id: item.id,
+//                               headerName: item.text,
+//                               width: item.width,
+//                             }}
+//                             onColumnClick={sortColumn}
+//                           />
+//                         ))}
+//                       </TableRow>
+//                     </TableHead>
+//                     {!isError ? (
+//                       <>
+//                         <TableBody>
+//                           {sortableTableData.map((item, index) => (
+//                             <TableRow key={index} colorIndex={index}>
+//                               <TableData defaultData={item.department} />
+//                               <TableData
+//                                 withImage={{
+//                                   imagePath: item.image_url,
+//                                   text: item.head,
+//                                 }}
+//                               />
+//                               <TableData defaultData={item.division_count} />
+//                               <TableData isAction={true} />
+//                             </TableRow>
+//                           ))}
+//                         </TableBody>
+//                       </>
+//                     ) : (
+//                       <p>Error fetching data.</p>
+//                     )}
+//                   </Table>
+//                 </TableContainer>
+
+//                 <TablePagination
+//                   tableData={tableData}
+//                   currentPage={currentPage}
+//                   recordPerPage={recordPerPage}
+//                   setCurrentPage={setCurrentPage}
+//                   totalPage={totalPage}
+//                 />
+//               </div>
+//             </>
+//           )}
+//         </>
+//       )}
+
+//       {/* {sortableTableData == null && <p>Loading Data.</p>} */}
+//     </>
+//   );
+// };
+
+// export default Department;

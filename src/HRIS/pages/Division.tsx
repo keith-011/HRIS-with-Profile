@@ -1,11 +1,30 @@
-import PageHeader from "../components/content/PageHeader";
-import useTableProperties from "../../hooks/useTableProperties";
-import TableRecordPerPage from "../components/ui/TableRecordPerPage";
-import TableHeader from "../components/ui/TableHeader";
-import Avatar1 from "/src/assets/images/Avatar.png";
+import Table from "../../Shared/components/ui/layout/Table";
+import TableRow from "../../Shared/components/ui/layout/TableRow";
 
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import PageHeader from "../components/content/PageHeader";
 import TablePagination from "../components/ui/TablePagination";
+import TableHeader from "../components/ui/table/TableHeader";
+import TableData from "../components/ui/table/TableData";
+import TableRecordPerPage from "../components/ui/TableRecordPerPage";
+
+import useTableProperties from "../../hooks/useTableProperties";
+
+import { ColumnHeader } from "../../utils/Globals";
+import { useState } from "react";
+import { useFetchData } from "../../hooks/useFetchData";
+import { useModalContext } from "../context/HRISContext";
+import TableContainer from "../../Shared/components/ui/layout/TableContainer";
+import { TableHead } from "@mui/material";
+import TableBody from "../components/ui/table/TableBody";
+import AddDivision from "../components/modals/AddDivision";
+
+interface FetchedData {
+  id: string;
+  division: string;
+  division_head: string;
+  image_path?: string;
+  department: string;
+}
 
 const Division = () => {
   const breadcrumbs = [
@@ -13,62 +32,24 @@ const Division = () => {
     { text: "Divisions", link: "/division" },
   ];
 
-  const tableHeader = [
-    { id: "division", text: "Division" },
-    { id: "division_head", text: "Division Head" },
-    { id: "department", text: "Department" },
-    { id: "action", text: "Action" },
+  const tableHeader: ColumnHeader[] = [
+    { id: "division", headerName: "Division", width: "w-[40%]" },
+    { id: "division_head", headerName: "Division Head", width: "w-[30%]" },
+    { id: "department", headerName: "Department", width: "w-[25%]" },
+    { id: "action", headerName: "Action", width: "w-[5%]" },
   ];
 
-  const tableData = [
-    {
-      id: "1",
-      division: "Parent and Community Outreach Division",
-      division_head: "Delone Iarch",
-      department: "Guidance and Counseling Services",
-    },
-    {
-      id: "2",
-      division: "Career Counseling Division",
-      division_head: "Tricia De Leon",
-      department: "Guidance and Counseling Services",
-    },
-    {
-      id: "3",
-      division: "Risk Assessment and Management Division",
-      division_head: "Bruno Lockhart",
-      department: "Safety and Security Management Office",
-    },
-    {
-      id: "4",
-      division: "Health and Safety Division",
-      division_head: "Bruno Lockhart",
-      department: "Safety and Security Management Office",
-    },
-    {
-      id: "5",
-      division: "IT Support Division",
-      division_head: "Ian Calleu",
-      department: "Center for Information  Management and Technical Support",
-    },
-    {
-      id: "6",
-      division: "Technology Integration Division",
-      division_head: "Victor Galleo",
-      department: "Center for Information  Management and Technical Support",
-    },
-    {
-      id: "7",
-      division: "Network Administration Division",
-      division_head: "Francis Cordello",
-      department: "Center for Information  Management and Technical Support",
-    },
-  ];
+  const { openModal, refresh } = useModalContext();
+
+  const { tableData, isError, isLoading } = useFetchData<FetchedData>(
+    "/v1/table/divisions",
+    refresh,
+  );
 
   const {
-    sortedTableData,
-    onClickHeaderSort,
-    onChangeMaxEntries,
+    sortableTableData,
+    sortColumn,
+    changePagination,
     setCurrentPage,
     totalPage,
     currentPage,
@@ -88,62 +69,66 @@ const Division = () => {
         }}
         buttonText="Add Division"
         buttonFunction={() => {
-          // TO DO
+          openModal({
+            header: "Add Division",
+            subheading:
+              "Add a new division by entering the required information here.",
+            content: <AddDivision />,
+          });
         }}
       />
 
-      <div className="flex flex-col gap-3">
-        <TableRecordPerPage onChange={onChangeMaxEntries} />
+      {isLoading && <p>Loading...</p>}
+      {!isLoading && isError && <p>An error ocurred.</p>}
+      {!isLoading && !isError && (
+        <>
+          <div className="flex flex-col gap-3">
+            <TableRecordPerPage onChange={changePagination} />
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow colorIndex={1}>
+                    {tableHeader.map((item) => (
+                      <TableHeader
+                        key={item.id}
+                        tableHeader={{
+                          id: item.id,
+                          headerName: item.headerName,
+                          width: item.width,
+                        }}
+                        onColumnClick={sortColumn}
+                      />
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sortableTableData.map((item, index) => (
+                    <TableRow key={item.id} colorIndex={index}>
+                      <TableData defaultData={item.division} />
+                      <TableData
+                        withImage={{
+                          imagePath: item.image_path,
+                          text: item.division_head,
+                        }}
+                      />
+                      <TableData defaultData={item.department} />
+                      <TableData isAction={true} />
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-        {/* Table */}
-        <div className="scrollable overflow-x-auto">
-          <table className="table">
-            <thead>
-              <tr>
-                <TableHeader
-                  tableHeader={tableHeader}
-                  requestSort={onClickHeaderSort}
-                />
-              </tr>
-            </thead>
-            <tbody className="table-body">
-              {sortedTableData.map((item, index) => (
-                <tr
-                  key={item.id}
-                  className={`${index % 2 == 0 ? "bg-accent-150" : "bg-accent-50"}`}
-                >
-                  {/* Standard Cells */}
-                  <td className="table-data">{item.division}</td>
-                  {/* For cells with images */}
-                  <td className="table-data">
-                    <div className="flex items-center gap-3">
-                      <div className="max-h-8 min-h-8 min-w-8 max-w-8 shrink-0 overflow-hidden rounded-full">
-                        <img src={Avatar1} className="object-cover" />
-                      </div>
-                      <span>{item.division_head}</span>
-                    </div>
-                  </td>
-                  <td className="table-data">{item.department}</td>
-                  {/* Action Cells */}
-                  <td className="table-data flex items-center justify-center">
-                    <button>
-                      <MoreVertIcon />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <TablePagination
-          tableData={tableData}
-          currentPage={currentPage}
-          recordPerPage={recordPerPage}
-          setCurrentPage={setCurrentPage}
-          totalPage={totalPage}
-        />
-      </div>
+            <TablePagination
+              tableData={tableData}
+              currentPage={currentPage}
+              recordPerPage={recordPerPage}
+              setCurrentPage={setCurrentPage}
+              totalPage={totalPage}
+            />
+          </div>
+        </>
+      )}
     </>
   );
 };

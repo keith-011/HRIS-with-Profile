@@ -3,13 +3,19 @@ import { ReactNode } from "react";
 interface Props {
   labelText: string;
   children: ReactNode;
+  errorMessage?: string;
 }
 
-const FormInput: React.FC<Props> = ({ labelText, children }) => {
+const FormInput: React.FC<Props> = ({ labelText, children, errorMessage }) => {
   return (
-    <div className="flex max-[576px]:flex-col max-[576px]:gap-1 min-[576px]:justify-between">
-      <label className="w-1/3 text-accent-600">{labelText}</label>
-      <div className="flex grow flex-col gap-1">{children}</div>
+    <div className="flex gap-4 max-[576px]:flex-col max-[576px]:gap-1 min-[576px]:justify-between">
+      <label className="shrink-0 text-accent-600 min-[577px]:w-1/3">
+        {labelText}
+      </label>
+      <div className="flex grow flex-col gap-1 overflow-hidden">
+        {children}
+        {errorMessage && <span className="text-red-400">{errorMessage}</span>}
+      </div>
     </div>
   );
 };
