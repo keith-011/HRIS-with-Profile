@@ -15,13 +15,13 @@ import {
 } from "../../../utils/Globals";
 
 import FormInput from "../../../Shared/components/ui/layout/FormInput";
-import DefaultDropdown from "../../../Shared/components/ui/dropdown/DefaultDropdown";
+import CustomSelect from "../../../Shared/components/ui/dropdown/CustomSelect";
 import { ToastHandleAxiosCatch } from "../../../utils/ToastFunctions";
 import { useModalContext } from "../../context/HRISContext";
 import { toast } from "react-toastify";
 
 const AddDepartment = () => {
-  const [nonHeadList, setNonHeadList] = useState<SelectIdDescription>([]);
+  const [nonHeadList, setNonHeadList] = useState<SelectIdDescription[]>([]);
   const [departmentNames, setDepartmentNames] = useState<DepartmentNames>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [isError, setError] = useState<boolean>(false);
@@ -114,7 +114,8 @@ const AddDepartment = () => {
               labelText="Department Head"
               errorMessage={errors.department_head?.message}
             >
-              <DefaultDropdown
+              <CustomSelect
+                typeOfData="IdAndDescription"
                 data={nonHeadList}
                 register={register("department_head")}
               />

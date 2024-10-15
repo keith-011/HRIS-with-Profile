@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -10,7 +11,11 @@ const schema = z.object({
       (value) => value.length === 1 || value.length === 0,
       "Only one file.",
     ),
-  sampleText: z.string(),
+  sampleText: z
+    .string()
+    // .refine((value) => value === "none", "Message must be none")
+    .transform((value) => (value === "none" ? "" : value))
+    .refine((value) => value === "", "Message is not an empty string"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -19,6 +24,8 @@ const TestingTable = () => {
   const {
     register,
     handleSubmit,
+    getValues,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -45,16 +52,25 @@ const TestingTable = () => {
     );
   };
 
+  useEffect(() => {
+    console.log(getValues("sampleText"));
+  }, [watch("sampleText"), onSubmit]);
+
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <input type="text" {...register("sampleText")} />
+        <div>
+          <label>Single Input:</label>
+          <input {...register("sampleText")} />
+          {errors.sampleText && (
+            <p className="text-red-400">{errors.sampleText.message}</p>
+          )}
+        </div>
         <div>
           <label>Single Input:</label>
           <input {...register("singleInput")} type="file" accept=".pdf" />
           {errors.singleInput && <p>{errors.singleInput.message}</p>}
         </div>
-
         <button type="submit">Submit</button>
       </form>
       <button onClick={handleDownload}>Download </button>

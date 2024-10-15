@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
-import axios from "axios";
 
 import {
   SelectIdDescription,
@@ -10,24 +9,31 @@ import {
 } from "../../../../../utils/Globals";
 
 import FormCategory from "../../FormCategory";
-import DefaultDropdown from "../../../../../Shared/components/ui/dropdown/DefaultDropdown";
+import CustomSelect from "../../../../../Shared/components/ui/dropdown/CustomSelect";
 import FormInput from "../../../../../Shared/components/ui/layout/FormInput";
 import { NewSchemaAddEmployeeType } from "../../../../schema/HRISAddEmployee";
-import SelectDepartmentHead from "../../../../../Shared/components/ui/dropdown/SelectDepartmentHead";
-import SelectDivisionHead from "../../../../../Shared/components/ui/dropdown/SelectDivisionHead";
 
 interface Props {
   activeCategory: number | null;
   handleCategoryClick: (id: number) => void;
+  plantillaData: FormPlantillaList[];
+  departmentData: DepartmentTable[];
+  divisionData: DivisionTable[];
+  categoryData: SelectIdDescription[];
+  statusData: SelectIdDescription[];
 }
 
 const EmploymentDetails: React.FC<Props> = ({
   activeCategory,
   handleCategoryClick,
+  plantillaData,
+  departmentData,
+  divisionData,
+  categoryData,
+  statusData,
 }) => {
   const {
     register,
-    getValues,
     setValue,
     formState: { errors },
     watch,
@@ -41,70 +47,31 @@ const EmploymentDetails: React.FC<Props> = ({
 
   const [isFieldError, setFieldError] = useState<boolean>(false);
 
-  const [plantillaData, setPlantillaData] = useState<FormPlantillaList[]>([]);
-  const [departmentData, setDepartmentData] = useState<DepartmentTable[]>([]);
-  const [divisionData, setDivisionData] = useState<DivisionTable[]>([]);
-  const [categoryData, setCategoryData] = useState<SelectIdDescription[]>([]);
-  const [statusData, setStatusData] = useState<SelectIdDescription[]>([]);
-
   const [payGrade, setPayGrade] = useState<string>("");
   const [respectiveDivisions, setRespectiveDivisions] = useState<
     DivisionTable[]
   >([]);
-  const [showCheckDepartment, setCheckDepartment] = useState<boolean>(false);
-  const [showCheckDivision, setCheckDivision] = useState<boolean>(false);
+  const [isDepartmentHeadVisible, setDepartmentHeadVisiblility] =
+    useState<boolean>(true);
+  const [isDivisionHeadVisible, setDivisionHeadVisiblility] =
+    useState<boolean>(true);
+
+  const [currentDepartmentHasHead, setCurrentDepartmentHead] =
+    useState<boolean>(false);
+
+  const [currentDivisionHasHead, setCurrentDivisionHead] =
+    useState<boolean>(false);
 
   const inputFields = [
     errors.plantilla?.message,
     errors.department?.message,
+    errors.isDepartmentHead?.message,
+    errors.division?.message,
+    errors.isDivisionHead?.message,
     errors.category?.message,
     errors.status?.message,
     errors.civil_eligibility?.message,
   ];
-
-  useEffect(() => {
-    const controller = new AbortController();
-    (async () => {
-      try {
-        const [
-          fetchPlantilla,
-          fetchDepartments,
-          fetchCategory,
-          fetchStatus,
-          fetchDivisionData,
-        ] = await Promise.all([
-          axios.get("/v1/forms/select/plantilla", {
-            signal: controller.signal,
-          }),
-          axios.get("/v1/forms/select/department_table", {
-            signal: controller.signal,
-          }),
-          axios.get("/v1/forms/select/category", {
-            signal: controller.signal,
-          }),
-          axios.get("/v1/forms/select/divisions", {
-            signal: controller.signal,
-          }),
-          axios.get("/v1/forms/select/division_table", {
-            signal: controller.signal,
-          }),
-        ]);
-        setPlantillaData(fetchPlantilla.data.rows);
-        setDepartmentData(fetchDepartments.data.rows);
-        setCategoryData(fetchCategory.data.rows);
-        setStatusData(fetchStatus.data.rows);
-        setDivisionData(fetchDivisionData.data.rows);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          console.log(error.message);
-        }
-      }
-    })();
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
 
   useEffect(() => {
     setFieldError(inputFields.some((item) => item !== undefined));
@@ -126,6 +93,8 @@ const EmploymentDetails: React.FC<Props> = ({
       (obj) => obj.id === watchDepartment,
     );
 
+    setCurrentDepartmentHead(departmentObject?.department_head ? true : false);
+
     const divisionsOfDepartment = divisionData.filter(
       (obj) => obj.department_id === watchDepartment,
     );
@@ -136,15 +105,13 @@ const EmploymentDetails: React.FC<Props> = ({
     }
 
     if (watchDepartment === "none") {
-      setCheckDepartment(false);
+      setDepartmentHeadVisiblility(false);
     }
 
-    if (departmentObject) {
-      if (departmentObject.department_head === null) {
-        setCheckDepartment(true);
-      } else {
-        setCheckDepartment(false);
-      }
+    if (departmentObject && departmentObject.department_head === null) {
+      setDepartmentHeadVisiblility(true);
+    } else {
+      setDepartmentHeadVisiblility(false);
     }
   }, [watchDepartment]);
 
@@ -153,26 +120,29 @@ const EmploymentDetails: React.FC<Props> = ({
 
     const divisionObject = divisionData.find((obj) => obj.id === watchDivision);
 
+    setCurrentDivisionHead(divisionObject?.division_head ? true : false);
+
     if (watchDivision === "none") {
-      setCheckDivision(false);
+      setDivisionHeadVisiblility(false);
+    } else {
+      setValue("isDepartmentHead", false);
     }
 
-    if (divisionObject) {
-      if (divisionObject.division_head === null) {
-        setCheckDivision(true);
-      } else {
-        setCheckDivision(false);
-      }
+    if (divisionObject && divisionObject.division_head === null) {
+      setDivisionHeadVisiblility(true);
+    } else {
+      setDivisionHeadVisiblility(false);
     }
   }, [watchDivision]);
 
   useEffect(() => {
     if (watchDepartmentHead) {
       setValue("isDivisionHead", false);
-      setCheckDivision(false);
+      setValue("division", "none");
+      setDivisionHeadVisiblility(false);
     } else {
-      if (watchDivision !== "none") {
-        setCheckDivision(true);
+      if (watchDivision !== "none" && !currentDivisionHasHead) {
+        setDivisionHeadVisiblility(true);
       }
     }
   }, [watchDepartmentHead]);
@@ -180,10 +150,10 @@ const EmploymentDetails: React.FC<Props> = ({
   useEffect(() => {
     if (watchDivisionHead) {
       setValue("isDepartmentHead", false);
-      setCheckDepartment(false);
+      setDepartmentHeadVisiblility(false);
     } else {
-      if (watchDepartment !== "none") {
-        setCheckDepartment(true);
+      if (watchDepartment !== "none" && !currentDepartmentHasHead) {
+        setDepartmentHeadVisiblility(true);
       }
     }
   }, [watchDivisionHead]);
@@ -202,7 +172,8 @@ const EmploymentDetails: React.FC<Props> = ({
           labelText="Designation (Plantilla)"
           errorMessage={errors.plantilla?.message}
         >
-          <DefaultDropdown
+          <CustomSelect
+            typeOfData="IdAndDescription"
             data={plantillaData}
             register={register("plantilla")}
           />
@@ -225,11 +196,12 @@ const EmploymentDetails: React.FC<Props> = ({
           labelText="Department (PCC)"
           errorMessage={errors.department?.message}
         >
-          <SelectDepartmentHead
-            data={departmentData}
+          <CustomSelect
             register={register("department")}
+            typeOfData="DepartmentsCategorized"
+            data={departmentData}
           />
-          {showCheckDepartment && (
+          {isDepartmentHeadVisible && (
             <label className="flex items-center justify-center gap-2 self-start">
               <input type="checkbox" {...register("isDepartmentHead")} />
               Assign as Head
@@ -240,11 +212,12 @@ const EmploymentDetails: React.FC<Props> = ({
           labelText="Division (PCC)"
           errorMessage={errors.division?.message}
         >
-          <SelectDivisionHead
-            data={respectiveDivisions}
+          <CustomSelect
             register={register("division")}
+            typeOfData="DivisionsCategorized"
+            data={respectiveDivisions}
           />
-          {showCheckDivision && (
+          {isDivisionHeadVisible && (
             <label className="flex items-center justify-center gap-2 self-start">
               <input type="checkbox" {...register("isDivisionHead")} />
               Assign as Head
@@ -252,13 +225,18 @@ const EmploymentDetails: React.FC<Props> = ({
           )}
         </FormInput>
         <FormInput labelText="Category" errorMessage={errors.category?.message}>
-          <DefaultDropdown
+          <CustomSelect
+            typeOfData="IdAndDescription"
             data={categoryData}
             register={register("category")}
           />
         </FormInput>
         <FormInput labelText="Status" errorMessage={errors.status?.message}>
-          <DefaultDropdown data={statusData} register={register("status")} />
+          <CustomSelect
+            typeOfData="IdAndDescription"
+            data={statusData}
+            register={register("status")}
+          />
         </FormInput>
         <FormInput
           labelText="Civil Eligility"

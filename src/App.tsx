@@ -19,6 +19,7 @@ import Department from "./HRIS/pages/Department";
 import Division from "./HRIS/pages/Division";
 import Profile from "./HRIS/pages/Profile";
 import TestingTable from "./HRIS/pages/TestingTable";
+import TestingVersion2 from "./HRIS/pages/TestingVersion2";
 
 axios.defaults.baseURL = "http://localhost:3000";
 
@@ -37,6 +38,7 @@ const router = createBrowserRouter(
         <Route path="profile/:id" element={<Profile />} />
       </Route>
       <Route path="testing" element={<TestingTable />} />
+      <Route path="testingNext" element={<TestingVersion2 />} />
     </Route>,
   ),
 );

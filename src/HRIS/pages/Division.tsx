@@ -1,5 +1,13 @@
+import { useFetchData } from "../../hooks/useFetchData";
+import useTableProperties from "../../hooks/useTableProperties";
+
+import { useModalContext } from "../context/HRISContext";
+
+import { ColumnHeader } from "../../utils/Globals";
+
 import Table from "../../Shared/components/ui/layout/Table";
 import TableRow from "../../Shared/components/ui/layout/TableRow";
+import TableContainer from "../../Shared/components/ui/layout/TableContainer";
 
 import PageHeader from "../components/content/PageHeader";
 import TablePagination from "../components/ui/TablePagination";
@@ -7,16 +15,10 @@ import TableHeader from "../components/ui/table/TableHeader";
 import TableData from "../components/ui/table/TableData";
 import TableRecordPerPage from "../components/ui/TableRecordPerPage";
 
-import useTableProperties from "../../hooks/useTableProperties";
-
-import { ColumnHeader } from "../../utils/Globals";
-import { useState } from "react";
-import { useFetchData } from "../../hooks/useFetchData";
-import { useModalContext } from "../context/HRISContext";
-import TableContainer from "../../Shared/components/ui/layout/TableContainer";
-import { TableHead } from "@mui/material";
 import TableBody from "../components/ui/table/TableBody";
 import AddDivision from "../components/modals/AddDivision";
+
+import { TableHead } from "@mui/material";
 
 interface FetchedData {
   id: string;

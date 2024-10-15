@@ -86,6 +86,20 @@ export type DepartmentNames = { department: string }[];
 
 export type EmployeeNumbers = { employee_number: string };
 
+export type PrimaryContacts = { primary_contact: string };
+
+export type Email = { email: string };
+
+export type EmployeeTable = {
+  employee_number: string;
+  name: string;
+  email: string;
+  plantilla: string;
+  department: string;
+  division: string;
+  image_path: string;
+};
+
 export type DivisionTable = {
   id: string;
   department_id: string;
@@ -109,6 +123,12 @@ export type SelectIdDescription = {
 export interface FormPlantillaList extends SelectIdDescription {
   salary_grade: number;
 }
+
+export type SSS = { sss: string };
+export type BIR_TIN = { bir_tin: string };
+export type GSIS = { gsis: string };
+export type Pagibig = { pagibig: string };
+export type PhilHealth = { philhealth: string };
 
 export const modalFormId = "modalForm";
 

@@ -1,10 +1,7 @@
 import { z, ZodIssueCode } from "zod";
-import { DivisionNames, SelectIdDescription } from "../../utils/Globals";
+import { DivisionNames } from "../../utils/Globals";
 
-export const AddDivisionSchema = (
-  divisionNames: DivisionNames,
-  nonHeadList: SelectIdDescription[],
-) => {
+export const AddDivisionSchema = (divisionNames: DivisionNames) => {
   return z.object({
     department_id: z.string().superRefine((data, ctx) => {
       if (data === "none") {

@@ -19,7 +19,7 @@ import {
 import { useModalContext } from "../../context/HRISContext";
 
 import FormInput from "../../../Shared/components/ui/layout/FormInput";
-import DefaultDropdown from "../../../Shared/components/ui/dropdown/DefaultDropdown";
+import CustomSelect from "../../../Shared/components/ui/dropdown/CustomSelect";
 import { toast } from "react-toastify";
 
 const AddDivision = () => {
@@ -67,7 +67,7 @@ const AddDivision = () => {
     };
   }, [refresh]);
 
-  const schema = AddDivisionSchema(divisionNames, nonHeadList);
+  const schema = AddDivisionSchema(divisionNames);
 
   const {
     register,
@@ -118,7 +118,8 @@ const AddDivision = () => {
               labelText="Department"
               errorMessage={errors.department_id?.message}
             >
-              <DefaultDropdown
+              <CustomSelect
+                typeOfData="IdAndDescription"
                 data={departmentList}
                 register={register("department_id")}
               />
@@ -139,7 +140,8 @@ const AddDivision = () => {
               labelText="Division Head"
               errorMessage={errors.division_head?.message}
             >
-              <DefaultDropdown
+              <CustomSelect
+                typeOfData="IdAndDescription"
                 data={nonHeadList}
                 register={register("division_head")}
               />

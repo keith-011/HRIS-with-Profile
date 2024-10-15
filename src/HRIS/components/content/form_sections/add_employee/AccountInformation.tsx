@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { AddEmployeeType } from "../../../../schema/HRISSchema";
 
 import FormCategory from "../../FormCategory";
 import FormInput from "../../../../../Shared/components/ui/layout/FormInput";
@@ -26,6 +25,7 @@ const AccountInformation: React.FC<Props> = ({
     errors.employee_number?.message,
     errors.password?.message,
     errors.confirm_password?.message,
+    errors.email?.message,
   ];
 
   useEffect(() => {
@@ -53,6 +53,17 @@ const AccountInformation: React.FC<Props> = ({
             {...register("employee_number")}
           />
         </FormInput>
+
+        <FormInput labelText="Email" errorMessage={errors.email?.message}>
+          <input
+            type="text"
+            maxLength={50}
+            placeholder="Employee Number"
+            className="modal-input"
+            {...register("email")}
+          />
+        </FormInput>
+
         <FormInput
           labelText="Account Password"
           errorMessage={errors.password?.message}

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
-import { AddEmployeeType } from "../../../../schema/HRISSchema";
-
 import FormInput from "../../../../../Shared/components/ui/layout/FormInput";
 import FormCategory from "../../FormCategory";
 import { NewSchemaAddEmployeeType } from "../../../../schema/HRISAddEmployee";
+import CustomSelect from "../../../../../Shared/components/ui/dropdown/CustomSelect";
 
 interface Props {
   activeCategory: number | null;
@@ -32,6 +31,7 @@ const PersonalInformation: React.FC<Props> = ({
     errors.lastName?.message,
     errors.suffix?.message,
     errors.birthday?.message,
+    errors.gender?.message,
   ];
 
   useEffect(() => {
@@ -100,6 +100,16 @@ const PersonalInformation: React.FC<Props> = ({
             placeholder="Suffix"
             className="modal-input"
             {...register("suffix")}
+          />
+        </FormInput>
+        <FormInput labelText="Gender" errorMessage={errors.gender?.message}>
+          <CustomSelect
+            data={[
+              { id: "Male", description: "Male" },
+              { id: "Female", description: "Female" },
+            ]}
+            typeOfData="IdAndDescription"
+            register={register("gender")}
           />
         </FormInput>
         <FormInput labelText="Birthday" errorMessage={errors.birthday?.message}>

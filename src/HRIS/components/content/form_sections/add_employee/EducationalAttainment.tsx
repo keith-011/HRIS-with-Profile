@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
-import { AddEmployeeType } from "../../../../schema/HRISSchema";
-
 import { EducationLevels } from "../../../../../utils/Globals";
 
 import DefaultButton from "../../../../../Shared/components/ui/button/DefaultButton";
@@ -11,6 +9,7 @@ import FormCategory from "../../FormCategory";
 
 import RemoveOutlinedIcon from "@mui/icons-material/RemoveOutlined";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import { NewSchemaAddEmployeeType } from "../../../../schema/HRISAddEmployee";
 
 interface Props {
   activeCategory: number | null;
@@ -32,7 +31,7 @@ const EducationalAttainment: React.FC<Props> = ({
     watch,
     formState: { errors },
     setValue,
-  } = useFormContext<AddEmployeeType>();
+  } = useFormContext<NewSchemaAddEmployeeType>();
 
   const isBachelorStudying = watch("bachelor_studying");
   const isMasteralStudying = watch("masteral_studying");
@@ -44,7 +43,7 @@ const EducationalAttainment: React.FC<Props> = ({
     errors.bachelor_school?.message,
     errors.bachelor_title?.message,
     errors.bachelor_start?.message,
-    errors.bachelor_end?.message,
+    errors.masteral_end?.message,
   ];
 
   const masteralFields = [
@@ -171,7 +170,8 @@ const EducationalAttainment: React.FC<Props> = ({
             type="text"
             maxLength={4}
             placeholder="Year"
-            className="modal-input"
+            disabled={isBachelorStudying}
+            className="modal-input disabled:bg-accent-100"
             {...register("bachelor_end")}
           />
           <label className="flex items-center justify-center gap-2 self-start">
@@ -238,7 +238,7 @@ const EducationalAttainment: React.FC<Props> = ({
             >
               <input
                 type="text"
-                maxLength={100}
+                maxLength={4}
                 placeholder="Year"
                 className="modal-input"
                 {...register("masteral_start")}
@@ -252,7 +252,8 @@ const EducationalAttainment: React.FC<Props> = ({
                 type="text"
                 maxLength={4}
                 placeholder="Year"
-                className="modal-input"
+                disabled={isMasteralStudying}
+                className="modal-input disabled:bg-accent-100"
                 {...register("masteral_end")}
               />
               <label className="flex items-center justify-center gap-2 self-start">
@@ -313,7 +314,7 @@ const EducationalAttainment: React.FC<Props> = ({
             >
               <input
                 type="text"
-                maxLength={100}
+                maxLength={4}
                 placeholder="Year"
                 className="modal-input"
                 {...register("doctorate_start")}
@@ -327,7 +328,8 @@ const EducationalAttainment: React.FC<Props> = ({
                 type="text"
                 maxLength={4}
                 placeholder="Year"
-                className="modal-input"
+                disabled={isDoctorateStudying}
+                className="modal-input disabled:bg-accent-100"
                 {...register("doctorate_end")}
               />
               <label className="flex items-center justify-center gap-2 self-start">

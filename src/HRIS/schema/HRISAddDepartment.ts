@@ -27,16 +27,6 @@ export const AddDepartmentSchema = (departmentNames: DepartmentNames) => {
           });
         }
       }),
-    // .refine(
-    //   (value) =>
-    //     departmentNames
-    //       ? !departmentNames.some(
-    //           (item) =>
-    //             item.department.toLowerCase() === value.toLocaleLowerCase(),
-    //         )
-    //       : "asdasd",
-    //   "Department name already exists.",
-    // ),
     department_head: z
       .string()
       .nullable()
