@@ -2,7 +2,7 @@ import { useFormContext } from "react-hook-form";
 import FormInput from "../../../../../Shared/components/ui/layout/FormInput";
 import FormCategory from "../../FormCategory";
 import { useState, useEffect } from "react";
-import { AddEmployeeType } from "../../../../schema/HRISSchema";
+import { NewSchemaAddEmployeeType } from "../../../../schema/HRISAddEmployee";
 
 interface Props {
   activeCategory: number | null;
@@ -16,16 +16,16 @@ const GovernmentNumbers: React.FC<Props> = ({
   const {
     register,
     formState: { errors },
-  } = useFormContext<AddEmployeeType>();
+  } = useFormContext<NewSchemaAddEmployeeType>();
 
   const [isFieldError, setFieldError] = useState<boolean>(false);
 
   const inputFields = [
-    errors.sss?.message,
-    errors.bir_tin?.message,
-    errors.gsis?.message,
-    errors.pagibig?.message,
-    errors.philhealth?.message,
+    errors.sss,
+    errors.birTin,
+    errors.gsis,
+    errors.pagibig,
+    errors.philhealth,
   ];
 
   useEffect(() => {
@@ -50,13 +50,13 @@ const GovernmentNumbers: React.FC<Props> = ({
             {...register("sss")}
           />
         </FormInput>
-        <FormInput labelText="BIR/TIN" errorMessage={errors.bir_tin?.message}>
+        <FormInput labelText="BIR/TIN" errorMessage={errors.birTin?.message}>
           <input
             type="text"
             maxLength={25}
             placeholder="BIR/TIN Number"
             className="modal-input"
-            {...register("bir_tin")}
+            {...register("birTin")}
           />
         </FormInput>
         <FormInput labelText="GSIS" errorMessage={errors.gsis?.message}>

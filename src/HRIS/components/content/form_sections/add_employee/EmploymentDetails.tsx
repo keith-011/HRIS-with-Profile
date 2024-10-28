@@ -5,6 +5,7 @@ import {
   SelectIdDescription,
   FormPlantillaList,
   DivisionTable,
+  FormCategoryList,
   DepartmentTable,
 } from "../../../../../utils/Globals";
 
@@ -18,8 +19,7 @@ interface Props {
   handleCategoryClick: (id: number) => void;
   plantillaData: FormPlantillaList[];
   departmentData: DepartmentTable[];
-  divisionData: DivisionTable[];
-  categoryData: SelectIdDescription[];
+  categoryData: FormCategoryList[];
   statusData: SelectIdDescription[];
 }
 
@@ -28,49 +28,37 @@ const EmploymentDetails: React.FC<Props> = ({
   handleCategoryClick,
   plantillaData,
   departmentData,
-  divisionData,
   categoryData,
   statusData,
 }) => {
   const {
     register,
-    setValue,
     formState: { errors },
     watch,
+    setValue,
   } = useFormContext<NewSchemaAddEmployeeType>();
 
   const watchPlantilla = watch("plantilla");
   const watchDepartment = watch("department");
-  const watchDivision = watch("division");
-  const watchDepartmentHead = watch("isDepartmentHead");
-  const watchDivisionHead = watch("isDivisionHead");
+  const watchCategory = watch("category");
 
+  const [showHeadCheckbox, setHeadCheckboxVisibility] =
+    useState<boolean>(false);
+  const [showAdminCheckbox, setAdminCheckboxVisibility] =
+    useState<boolean>(false);
+  const [payGrade, setPayGrade] = useState<string>("");
   const [isFieldError, setFieldError] = useState<boolean>(false);
 
-  const [payGrade, setPayGrade] = useState<string>("");
-  const [respectiveDivisions, setRespectiveDivisions] = useState<
-    DivisionTable[]
-  >([]);
-  const [isDepartmentHeadVisible, setDepartmentHeadVisiblility] =
-    useState<boolean>(true);
-  const [isDivisionHeadVisible, setDivisionHeadVisiblility] =
-    useState<boolean>(true);
-
-  const [currentDepartmentHasHead, setCurrentDepartmentHead] =
-    useState<boolean>(false);
-
-  const [currentDivisionHasHead, setCurrentDivisionHead] =
-    useState<boolean>(false);
-
   const inputFields = [
-    errors.plantilla?.message,
-    errors.department?.message,
-    errors.isDepartmentHead?.message,
-    errors.division?.message,
-    errors.isDivisionHead?.message,
-    errors.category?.message,
-    errors.status?.message,
-    errors.civil_eligibility?.message,
+    errors.plantilla,
+    errors.status,
+    errors.department,
+    errors.isDepartmentHead,
+    errors.designation,
+    errors.category,
+    errors.withAdminFunction,
+    errors.civilServiceEligibility,
+    errors.dailyRate,
   ];
 
   useEffect(() => {
@@ -78,7 +66,7 @@ const EmploymentDetails: React.FC<Props> = ({
   }, [inputFields]);
 
   useEffect(() => {
-    if (watchPlantilla !== "none") {
+    if (watchPlantilla !== "") {
       let toFind = plantillaData.find((item) => item.id === watchPlantilla);
       toFind && setPayGrade(toFind.salary_grade.toString());
     } else {
@@ -89,74 +77,28 @@ const EmploymentDetails: React.FC<Props> = ({
   useEffect(() => {
     setValue("isDepartmentHead", false);
 
-    const departmentObject = departmentData.find(
-      (obj) => obj.id === watchDepartment,
+    const getDepartment = departmentData.find(
+      (item) => item.id === watchDepartment,
     );
 
-    setCurrentDepartmentHead(departmentObject?.department_head ? true : false);
-
-    const divisionsOfDepartment = divisionData.filter(
-      (obj) => obj.department_id === watchDepartment,
-    );
-
-    if (divisionsOfDepartment) {
-      setRespectiveDivisions(divisionsOfDepartment);
-      setValue("division", "none");
-    }
-
-    if (watchDepartment === "none") {
-      setDepartmentHeadVisiblility(false);
-    }
-
-    if (departmentObject && departmentObject.department_head === null) {
-      setDepartmentHeadVisiblility(true);
+    if (getDepartment?.department_head === null) {
+      setHeadCheckboxVisibility(true);
     } else {
-      setDepartmentHeadVisiblility(false);
+      setHeadCheckboxVisibility(false);
     }
   }, [watchDepartment]);
 
   useEffect(() => {
-    setValue("isDivisionHead", false);
+    setValue("withAdminFunction", false);
 
-    const divisionObject = divisionData.find((obj) => obj.id === watchDivision);
+    const getCategory = categoryData.find((item) => item.id === watchCategory);
 
-    setCurrentDivisionHead(divisionObject?.division_head ? true : false);
-
-    if (watchDivision === "none") {
-      setDivisionHeadVisiblility(false);
+    if (getCategory?.admin_compatible === true) {
+      setAdminCheckboxVisibility(true);
     } else {
-      setValue("isDepartmentHead", false);
+      setAdminCheckboxVisibility(false);
     }
-
-    if (divisionObject && divisionObject.division_head === null) {
-      setDivisionHeadVisiblility(true);
-    } else {
-      setDivisionHeadVisiblility(false);
-    }
-  }, [watchDivision]);
-
-  useEffect(() => {
-    if (watchDepartmentHead) {
-      setValue("isDivisionHead", false);
-      setValue("division", "none");
-      setDivisionHeadVisiblility(false);
-    } else {
-      if (watchDivision !== "none" && !currentDivisionHasHead) {
-        setDivisionHeadVisiblility(true);
-      }
-    }
-  }, [watchDepartmentHead]);
-
-  useEffect(() => {
-    if (watchDivisionHead) {
-      setValue("isDepartmentHead", false);
-      setDepartmentHeadVisiblility(false);
-    } else {
-      if (watchDepartment !== "none" && !currentDepartmentHasHead) {
-        setDepartmentHeadVisiblility(true);
-      }
-    }
-  }, [watchDivisionHead]);
+  }, [watchCategory]);
 
   return (
     <>
@@ -169,7 +111,8 @@ const EmploymentDetails: React.FC<Props> = ({
       >
         {/* Employment Details */}
         <FormInput
-          labelText="Designation (Plantilla)"
+          labelText="Plantilla Position"
+          requiredAsterisk={true}
           errorMessage={errors.plantilla?.message}
         >
           <CustomSelect
@@ -178,22 +121,33 @@ const EmploymentDetails: React.FC<Props> = ({
             register={register("plantilla")}
           />
         </FormInput>
-        <FormInput
-          labelText="Pay Grade"
-          // errorMessage={errors.pay_grade?.message}
-        >
+
+        <FormInput labelText="Salary Grade">
           <input
             type="number"
-            maxLength={10}
-            placeholder="Pay Grade"
+            maxLength={5}
+            placeholder="Salary Grade"
             value={payGrade}
             disabled
             className="modal-input disabled:bg-accent-100"
-            // {...register("pay_grade")}
           />
         </FormInput>
+
         <FormInput
-          labelText="Department (PCC)"
+          labelText="Status"
+          requiredAsterisk={true}
+          errorMessage={errors.status?.message}
+        >
+          <CustomSelect
+            typeOfData="IdAndDescription"
+            data={statusData}
+            register={register("status")}
+          />
+        </FormInput>
+
+        <FormInput
+          labelText="Department"
+          requiredAsterisk={true}
           errorMessage={errors.department?.message}
         >
           <CustomSelect
@@ -201,53 +155,70 @@ const EmploymentDetails: React.FC<Props> = ({
             typeOfData="DepartmentsCategorized"
             data={departmentData}
           />
-          {isDepartmentHeadVisible && (
-            <label className="flex items-center justify-center gap-2 self-start">
+
+          {showHeadCheckbox && (
+            <label className="form-checkbox">
               <input type="checkbox" {...register("isDepartmentHead")} />
-              Assign as Head
+              <span>Assign as Head</span>
             </label>
           )}
         </FormInput>
+
         <FormInput
-          labelText="Division (PCC)"
-          errorMessage={errors.division?.message}
+          labelText="Designation"
+          requiredAsterisk={true}
+          errorMessage={errors.designation?.message}
         >
-          <CustomSelect
-            register={register("division")}
-            typeOfData="DivisionsCategorized"
-            data={respectiveDivisions}
+          <input
+            type="text"
+            maxLength={75}
+            placeholder="Designation"
+            className="modal-input"
+            {...register("designation")}
           />
-          {isDivisionHeadVisible && (
-            <label className="flex items-center justify-center gap-2 self-start">
-              <input type="checkbox" {...register("isDivisionHead")} />
-              Assign as Head
-            </label>
-          )}
         </FormInput>
-        <FormInput labelText="Category" errorMessage={errors.category?.message}>
+
+        <FormInput
+          labelText="Category"
+          requiredAsterisk={true}
+          errorMessage={errors.category?.message}
+        >
           <CustomSelect
             typeOfData="IdAndDescription"
             data={categoryData}
             register={register("category")}
           />
+          {showAdminCheckbox && (
+            <label className="form-checkbox">
+              <input type="checkbox" {...register("withAdminFunction")} />
+              <span>With Admin Function?</span>
+            </label>
+          )}
         </FormInput>
-        <FormInput labelText="Status" errorMessage={errors.status?.message}>
-          <CustomSelect
-            typeOfData="IdAndDescription"
-            data={statusData}
-            register={register("status")}
-          />
-        </FormInput>
+
         <FormInput
-          labelText="Civil Eligility"
-          errorMessage={errors.civil_eligibility?.message}
+          labelText="Civil Service Eligility"
+          errorMessage={errors.civilServiceEligibility?.message}
         >
           <input
             type="text"
             maxLength={75}
-            placeholder="Civil Eligibility"
+            placeholder="Civil Service Eligility"
             className="modal-input"
-            {...register("civil_eligibility")}
+            {...register("civilServiceEligibility")}
+          />
+        </FormInput>
+
+        <FormInput
+          labelText="Daily Rate"
+          errorMessage={errors.dailyRate?.message}
+        >
+          <input
+            type="text"
+            maxLength={25}
+            placeholder="Daily Rate"
+            className="modal-input"
+            {...register("dailyRate")}
           />
         </FormInput>
       </FormCategory>

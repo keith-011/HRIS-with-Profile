@@ -14,6 +14,8 @@ import useTableProperties from "../../hooks/useTableProperties";
 import AddEmployee from "../components/modals/AddEmployee";
 import { useFetchData } from "../../hooks/useFetchData";
 import { EmployeeTable } from "../../utils/Globals";
+import TableHead from "../components/ui/table/TableHead";
+import TableBody from "../components/ui/table/TableBody";
 
 const Employee = () => {
   const breadcrumbs = [
@@ -27,7 +29,7 @@ const Employee = () => {
     { id: "email", text: "Email", width: "w-[10%]" },
     { id: "plantilla", text: "Designation (Plantilla)", width: "w-[20%]" },
     { id: "department", text: "Department", width: "w-[20%]" },
-    { id: "division", text: "Division", width: "w-[20%]" },
+    { id: "division", text: "Designation", width: "w-[20%]" },
     { id: "action", text: "Action", width: "w-[5%]" },
   ];
 
@@ -37,45 +39,6 @@ const Employee = () => {
     "/v1/table/employees",
     refresh,
   );
-
-  // const tableData = [
-  //   {
-  //     id: "1",
-  //     image_url: "/src/assets/images/Avatar.png",
-  //     name: "Isabella Gray",
-  //     employee_number: "2020-00096-PQ-0",
-  //     email: "sample@gmail.com",
-  //     plantilla: "Associate Professor I",
-  //     designation: "Local Human Resource Management Office",
-  //   },
-  //   {
-  //     id: "2",
-  //     image_url: "/src/assets/images/Avatar.png",
-  //     name: "Isabella Gray",
-  //     employee_number: "2020-00097-PQ-0",
-  //     email: "sample@gmails.com",
-  //     plantilla: "Associate Professor eI",
-  //     designation: "Local Human Resource Management Office",
-  //   },
-  //   {
-  //     id: "3",
-  //     image_url: "/src/assets/images/Avatar.png",
-  //     name: "Isabella Gray",
-  //     employee_number: "2020-00098-PQ-0",
-  //     email: "sample@gmail.com",
-  //     plantilla: "Associate Professor I",
-  //     designation: "Local Human Resource Management Office",
-  //   },
-  //   {
-  //     id: "4",
-  //     image_url: "/src/assets/images/Avatar.png",
-  //     name: "Isabella Gray",
-  //     employee_number: "2020-00099-PQ-0",
-  //     email: "sample@gmail.com",
-  //     plantilla: "Associate Professor I",
-  //     designation: "Local Human Resource Management Office",
-  //   },
-  // ];
 
   const {
     sortableTableData,
@@ -117,8 +80,8 @@ const Employee = () => {
             <TableRecordPerPage onChange={changePagination} />
 
             <Table>
-              <thead>
-                <tr>
+              <TableHead>
+                <TableRow colorIndex={1}>
                   {tableHeader.map((item) => (
                     <TableHeader
                       key={item.id}
@@ -130,16 +93,12 @@ const Employee = () => {
                       onColumnClick={sortColumn}
                     />
                   ))}
-                </tr>
-              </thead>
-              <tbody className="table-body">
+                </TableRow>
+              </TableHead>
+              <TableBody>
                 {sortableTableData.map((item, index) => (
                   <TableRow key={index} colorIndex={index}>
-                    <TableData
-                      defaultData={
-                        item.employee_number ? item.employee_number : "N/A"
-                      }
-                    />
+                    <TableData defaultData={item.employee_number} />
                     <TableData
                       withImage={{
                         imagePath: item.image_path,
@@ -147,19 +106,13 @@ const Employee = () => {
                       }}
                     />
                     <TableData defaultData={item.email} />
-                    <TableData
-                      defaultData={item.plantilla ? item.plantilla : "N/A"}
-                    />
-                    <TableData
-                      defaultData={item.department ? item.department : "N/A"}
-                    />
-                    <TableData
-                      defaultData={item.division ? item.division : "N/A"}
-                    />
+                    <TableData defaultData={item.plantilla} />
+                    <TableData defaultData={item.department} />
+                    <TableData defaultData={item.division} />
                     <TableData isAction={true} />
                   </TableRow>
                 ))}
-              </tbody>
+              </TableBody>
             </Table>
 
             <TablePagination

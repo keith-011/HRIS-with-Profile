@@ -22,6 +22,10 @@ const ModalBase = () => {
               {content?.header}
             </h3>
             <p className="text-sm text-accent-50">{content?.subheading} </p>
+            <p className="mt-1 text-sm text-accent-50">
+              Fields marked with (<span className="text-red-400">*</span>) are
+              required.
+            </p>
           </span>
           <button
             className="flex items-center justify-center self-start rounded-full bg-accent-50 p-2"

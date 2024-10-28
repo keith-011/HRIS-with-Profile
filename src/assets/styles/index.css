@@ -18,6 +18,10 @@
   @apply w-full rounded border border-accent-200 bg-accent-50 px-3 py-4 focus:border-accent-400 focus:outline-none;
 }
 
+.form-checkbox {
+  @apply flex items-center gap-2;
+}
+
 /* @font-face {
   font-family: "Roboto";
   src: url("../fonts/Roboto-Regular.ttf") format("truetype");

@@ -1,11 +1,5 @@
 export type ColumnHeader = { id: string; headerName: string; width: string };
 
-export interface EducationLevels {
-  bachelor: boolean;
-  masteral: boolean;
-  doctorate: boolean;
-}
-
 export const MimeFileType = {
   // File Types
   PDF: "application/pdf",
@@ -124,12 +118,49 @@ export interface FormPlantillaList extends SelectIdDescription {
   salary_grade: number;
 }
 
-export type SSS = { sss: string };
-export type BIR_TIN = { bir_tin: string };
-export type GSIS = { gsis: string };
-export type Pagibig = { pagibig: string };
-export type PhilHealth = { philhealth: string };
+export interface FormCategoryList extends SelectIdDescription {
+  admin_compatible: boolean;
+}
 
 export const modalFormId = "modalForm";
 
 export const maxTableRecord = [10, 25, 50, 100];
+
+export interface AddEmployeeFetchData {
+  existence: {
+    email: { email: string }[];
+    employeeNumberPCC: { employee_number_pcc: string }[];
+    employeeNumberCH: { employee_number_ch: string }[];
+    sss: { sss: string }[];
+    birTin: { bir_tin: string }[];
+    gsis: { gsis: string }[];
+    pagIbig: { pag_ibig: string }[];
+    philHealth: { philHealth: string }[];
+    primaryContact: { primary_contact: string }[];
+  };
+
+  selectData: {
+    plantilla: FormPlantillaList[];
+    department: DepartmentTable[];
+    category: FormCategoryList[];
+    status: SelectIdDescription[];
+  };
+}
+
+export const civilStatusData: SelectIdDescription[] = [
+  { id: "Single", description: "Single" },
+  { id: "Married", description: "Married" },
+  { id: "Widowed", description: "Widowed" },
+];
+
+export const genderData: SelectIdDescription[] = [
+  { id: "Male", description: "Male" },
+  { id: "Female", description: "Female" },
+];
+
+export const educationLevelData: SelectIdDescription[] = [
+  { id: "Secondary", description: "Secondary" },
+  { id: "Vocational", description: "Vocational" },
+  { id: "College", description: "College" },
+  { id: "Graduate Studies", description: "Graduate Studies" },
+];

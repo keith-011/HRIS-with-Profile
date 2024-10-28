@@ -8,6 +8,7 @@ import {
 
 interface BaseProps {
   register: UseFormRegisterReturn;
+  defaultNone?: boolean;
   typeOfData:
     | "IdAndDescription"
     | "DepartmentsCategorized"
@@ -34,7 +35,12 @@ type FinalProps =
   | CategorizedDepartments
   | CategorizedDivisions;
 
-const CustomSelect: React.FC<FinalProps> = ({ register, typeOfData, data }) => {
+const CustomSelect: React.FC<FinalProps> = ({
+  register,
+  typeOfData,
+  data,
+  defaultNone = true,
+}) => {
   return (
     <>
       {/* TO DO */}
@@ -42,7 +48,7 @@ const CustomSelect: React.FC<FinalProps> = ({ register, typeOfData, data }) => {
         {...register}
         className="text-ellipsis rounded border border-accent-200 bg-accent-50 px-3 py-4 outline-accent-200 focus:outline-accent-400"
       >
-        <option value={"none"}>None</option>
+        {defaultNone && <option value="">None</option>}
         {typeOfData === "IdAndDescription" &&
           data.length > 0 &&
           data.map((item) => (

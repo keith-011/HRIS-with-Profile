@@ -1,18 +1,10 @@
 import { z, ZodIssueCode } from "zod";
 import {
-  BIR_TIN,
-  EducationLevels,
-  Email,
-  EmployeeNumbers,
-  GSIS,
-  Pagibig,
-  PhilHealth,
-  PrimaryContacts,
-  SSS,
+  AddEmployeeFetchData,
+  civilStatusData,
+  educationLevelData,
+  genderData,
 } from "../../utils/Globals";
-
-const currentYear = new Date().getFullYear();
-const minimumYear = currentYear - 100;
 
 const TextInput = (required: boolean, min: number, max: number) => {
   if (required) {
@@ -34,13 +26,6 @@ const SelectInputRequired = z
   .trim()
   .min(1, "This field is required.")
   .superRefine((data, ctx) => {
-    if (data === "none") {
-      ctx.addIssue({
-        code: ZodIssueCode.custom,
-        message: "This field is required.",
-      });
-      return;
-    }
     if (!z.string().uuid().safeParse(data).success) {
       ctx.addIssue({
         code: ZodIssueCode.custom,
@@ -50,54 +35,39 @@ const SelectInputRequired = z
     }
   });
 
-const SelectInputOptional = z
-  .string()
-  .trim()
-  .refine(
-    (value) => value === "none" || z.string().uuid().safeParse(value).success,
-    "Invalid input.",
-  )
-  .transform((value) => (value === "none" ? "" : value));
-
-const school_start = z
-  .string()
-  .trim()
-  .min(1, "Year required.")
-  .max(4, "Invalid year.")
-  .refine((value) => !isNaN(Number(value)), "Invalid input.")
-  .transform((value) => Number(value))
-  .refine(
-    (value) => value >= minimumYear && value <= currentYear,
-    `Year must be between ${minimumYear} and ${currentYear}`,
-  );
-
-const school_end = z
-  .string()
-  .trim()
-  .max(4, "Invalid year.")
-  .transform((value) => {
-    return value === "" || isNaN(Number(value)) ? "" : Number(value);
-  });
-
 export const NewSchemaAddEmployee = (
-  employeeNumberList: EmployeeNumbers[],
-  educationLevelStatus: EducationLevels,
-  emailList: Email[],
-  sssList: SSS[],
-  tinList: BIR_TIN[],
-  gsisList: GSIS[],
-  pagibigList: Pagibig[],
-  philHealthList: PhilHealth[],
-  primaryContactList: PrimaryContacts[],
+  empNumberPcc: AddEmployeeFetchData["existence"]["employeeNumberPCC"],
+  empNumberCityHall: AddEmployeeFetchData["existence"]["employeeNumberCH"],
+  emailList: AddEmployeeFetchData["existence"]["email"],
+  sssList: AddEmployeeFetchData["existence"]["sss"],
+  tinList: AddEmployeeFetchData["existence"]["birTin"],
+  gsisList: AddEmployeeFetchData["existence"]["gsis"],
+  pagibigList: AddEmployeeFetchData["existence"]["pagIbig"],
+  philHealthList: AddEmployeeFetchData["existence"]["philHealth"],
+  primaryContactList: AddEmployeeFetchData["existence"]["primaryContact"],
 ) => {
   return z
     .object({
       // Account Information
-      employee_number: TextInput(true, 1, 50).refine(
+      employeeNumberCityHall: TextInput(true, 1, 50).refine(
         (value) =>
-          !employeeNumberList.some((field) => value === field.employee_number),
+          !empNumberCityHall.some(
+            (field) => value === field.employee_number_ch,
+          ),
         "Employee number already exists.",
       ),
+      employeeNumberPCC: TextInput(false, 0, 50)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        })
+        .refine(
+          (value) =>
+            value === null ||
+            !empNumberPcc.some((field) => value === field.employee_number_pcc),
+          "Employee number already exists.",
+        ),
+      autoGenerate: z.boolean(),
       email: TextInput(true, 1, 80)
         .email("Invalid email format.")
         .refine(
@@ -119,35 +89,46 @@ export const NewSchemaAddEmployee = (
         /^[A-Za-zÀ-ÿ\s'-]+$/,
         "Invalid input.",
       ),
-
       middleName: TextInput(false, 0, 50)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        })
         .refine(
-          (value) => value === "" || /^[A-Za-zÀ-ÿ\s'-]+$/.test(value),
+          (value) => value === null || /^[A-Za-zÀ-ÿ\s'-]+$/.test(value),
           "Invalid input",
-        )
-        .optional(),
-
+        ),
       lastName: TextInput(true, 1, 50).regex(
         /^[A-Za-zÀ-ÿ\s'-]+$/,
         "Invalid input.",
       ),
-
       suffix: TextInput(false, 0, 10)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        })
         .refine(
-          (value) => value === "" || /^[A-Za-z]+$/.test(value),
+          (value) => value === null || /^[A-Za-z]+$/.test(value),
           "Invalid input.",
-        )
-        .optional(),
-
-      gender: TextInput(true, 1, 10).refine(
-        (value) => value === "Male" || value === "Female",
-        "This field is required.",
-      ),
+        ),
+      gender: z
+        .string()
+        .refine(
+          (value) => genderData.some((item) => item.id === value),
+          "Invalid input.",
+        ),
 
       birthday: TextInput(true, 1, 25).refine(
         (value) => !isNaN(Date.parse(value)),
         "Invalid input.",
       ),
+      civilStatus: z
+        .string()
+        .refine(
+          (value) => civilStatusData.some((item) => item.id === value),
+          "Invalid input.",
+        ),
+      nationality: TextInput(true, 1, 50),
 
       // Address & Contact
       primaryContact: TextInput(true, 1, 25)
@@ -161,140 +142,211 @@ export const NewSchemaAddEmployee = (
         ),
 
       secondaryContact: TextInput(false, 0, 25)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        })
         .refine(
-          (value) => value === "" || /^\d+$/.test(value),
+          (value) => value === null || /^\d+$/.test(value),
           "Invalid input.",
-        )
-        .optional(),
+        ),
+      presentAddress: TextInput(true, 1, 175),
 
-      fullAddress: TextInput(true, 1, 175),
+      permanentAddress: TextInput(true, 1, 175),
 
       // Employment Details
-      plantilla: SelectInputOptional.optional(),
+      plantilla: SelectInputRequired,
+
+      status: SelectInputRequired,
 
       department: SelectInputRequired,
 
       isDepartmentHead: z.boolean(),
 
-      division: SelectInputOptional.optional(),
-
-      isDivisionHead: z.boolean(),
+      designation: TextInput(true, 1, 75).regex(
+        /^[A-Za-z\s]+$/,
+        "Invalid input.",
+      ),
 
       category: SelectInputRequired,
 
-      status: SelectInputRequired,
+      withAdminFunction: z.boolean(),
 
-      civil_eligibility: TextInput(false, 0, 75)
+      civilServiceEligibility: TextInput(false, 0, 75)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        })
         .refine(
-          (value) => value === "" || /^[A-Za-zÀ-ÿ\s'-]+$/.test(value),
+          (value) => value === null || /^[A-Za-zÀ-ÿ\s'-]+$/.test(value),
           "Invalid input.",
-        )
-        .optional(),
+        ),
 
+      dailyRate: TextInput(false, 0, 25)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        }),
       // Educational Attainment
-      bachelor_school: TextInput(true, 1, 100).regex(
-        /^[A-Za-zÀ-ÿ\s'-]+$/,
-        "Invalid input.",
-      ),
-      bachelor_title: TextInput(true, 1, 100).regex(
-        /^[A-Za-zÀ-ÿ\s'-]+$/,
-        "Invalid input.",
-      ),
+      educationalBackground: z
+        .array(
+          z
+            .object({
+              educationLevel: z
+                .string()
+                .refine(
+                  (value) =>
+                    educationLevelData.some((item) => item.id === value),
+                  "Invalid input.",
+                ),
 
-      bachelor_start: school_start,
+              programType: TextInput(false, 0, 50)
+                .nullable()
+                .transform((value) => {
+                  return value === "" ? null : value;
+                })
+                .refine(
+                  (value) => value === null || /^[A-Za-z\s']+$/.test(value),
+                  "Invalid input.",
+                ),
+              courseTitle: TextInput(false, 0, 50)
+                .nullable()
+                .transform((value) => {
+                  return value === "" ? null : value;
+                })
+                .refine(
+                  (value) => value === null || /^[A-Za-z\s']+$/.test(value),
+                  "Invalid input.",
+                ),
 
-      bachelor_end: school_end,
+              schoolName: TextInput(true, 1, 100).regex(
+                /^[A-Za-z\s']+$/,
+                "Invalid input.",
+              ),
 
-      bachelor_studying: z.boolean(),
-
-      // Masteral
-      masteral_school: educationLevelStatus.masteral
-        ? TextInput(true, 1, 100).regex(/^[A-Za-zÀ-ÿ\s'-]+$/, "Invalid input.")
-        : z.literal(""),
-
-      masteral_title: educationLevelStatus.masteral
-        ? TextInput(true, 1, 100).regex(/^[A-Za-zÀ-ÿ\s'-]+$/, "Invalid input.")
-        : z.literal(""),
-
-      masteral_start: educationLevelStatus.masteral
-        ? z
-            .string()
-            .trim()
-            .min(1, "This field is required.")
-            .max(4, "Invalid year.")
-            .transform((value) => {
-              return value === "" || isNaN(Number(value)) ? "" : Number(value);
+              yearStart: TextInput(true, 1, 4).refine(
+                (value) => !isNaN(Number(value)),
+                "Invalid input.",
+              ),
+              yearGraduated: TextInput(false, 0, 4)
+                .nullable()
+                .transform((value) => {
+                  return value === "" ? null : value;
+                })
+                .refine(
+                  (value) => value === "" || !isNaN(Number(value)),
+                  "Invalid input.",
+                ),
+              isStudying: z.boolean(),
             })
-        : z.literal(""),
+            .superRefine((data, ctx) => {
+              if (
+                data.yearGraduated != null &&
+                !isNaN(Number(data.yearStart)) &&
+                !isNaN(Number(data.yearGraduated))
+              ) {
+                if (Number(data.yearStart) > Number(data.yearGraduated)) {
+                  ctx.addIssue({
+                    code: ZodIssueCode.custom,
+                    message: "Year start cannot be greater than graduate year.",
+                    path: ["yearGraduated"],
+                  });
+                }
+              }
 
-      masteral_end: educationLevelStatus.masteral ? school_end : z.literal(""),
-
-      masteral_studying: z.boolean(),
-
-      // Doctorate
-      doctorate_school: educationLevelStatus.doctorate
-        ? TextInput(true, 1, 100).regex(/^[A-Za-zÀ-ÿ\s'-]+$/, "Invalid input.")
-        : z.literal(""),
-
-      doctorate_title: educationLevelStatus.doctorate
-        ? TextInput(true, 1, 100).regex(/^[A-Za-zÀ-ÿ\s'-]+$/, "Invalid input.")
-        : z.literal(""),
-
-      doctorate_start: educationLevelStatus.doctorate
-        ? z
-            .string()
-            .trim()
-            .min(1, "This field is required.")
-            .max(4, "Invalid year.")
-            .transform((value) => {
-              return value === "" || isNaN(Number(value)) ? "" : Number(value);
-            })
-        : z.literal(""),
-
-      doctorate_end: educationLevelStatus.doctorate
-        ? school_end
-        : z.literal(""),
-
-      doctorate_studying: z.boolean(),
+              if (data.yearGraduated == null && !data.isStudying) {
+                ctx.addIssue({
+                  code: ZodIssueCode.custom,
+                  message: "This field is required.",
+                  path: ["yearGraduated"],
+                });
+              }
+            }),
+        )
+        .min(1, "At least one education is required."),
 
       // Government Numbers
-      sss: TextInput(true, 1, 25)
-        .regex(/^[\d]+$/, "Invalid input.")
+      sss: TextInput(false, 0, 25)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        })
+        .refine(
+          (value) => value === null || /^[\d]+$/.test(value),
+          "Invalid value.",
+        )
         .refine(
           (value) => !sssList.some((field) => value === field.sss),
           "SSS number already exists.",
         ),
 
-      bir_tin: TextInput(true, 1, 25)
-        .regex(/^[\d]+$/, "Invalid input.")
+      birTin: TextInput(false, 0, 25)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        })
+        .refine(
+          (value) => value === null || /^[\d]+$/.test(value),
+          "Invalid value.",
+        )
         .refine(
           (value) => !tinList.some((field) => value === field.bir_tin),
           "BIR/TIN number already exists.",
         ),
 
-      gsis: TextInput(true, 1, 25)
-        .regex(/^[\d]+$/, "Invalid input.")
+      gsis: TextInput(false, 0, 25)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        })
+        .refine(
+          (value) => value === null || /^[\d]+$/.test(value),
+          "Invalid value.",
+        )
         .refine(
           (value) => !gsisList.some((field) => value === field.gsis),
           "GSIS number already exists.",
         ),
 
-      pagibig: TextInput(true, 1, 25)
-        .regex(/^[\d]+$/, "Invalid input.")
+      pagibig: TextInput(false, 0, 25)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        })
         .refine(
-          (value) => !pagibigList.some((field) => value === field.pagibig),
+          (value) => value === null || /^[\d]+$/.test(value),
+          "Invalid value.",
+        )
+        .refine(
+          (value) => !pagibigList.some((field) => value === field.pag_ibig),
           "PagIbig number already exists.",
         ),
 
-      philhealth: TextInput(true, 1, 25)
-        .regex(/^[\d]+$/, "Invalid input.")
+      philhealth: TextInput(false, 0, 25)
+        .nullable()
+        .transform((value) => {
+          return value === "" ? null : value;
+        })
+        .refine(
+          (value) => value === null || /^[\d]+$/.test(value),
+          "Invalid value.",
+        )
         .refine(
           (value) =>
-            !philHealthList.some((field) => value === field.philhealth),
+            !philHealthList.some((field) => value === field.philHealth),
           "PhilHealth number already exists.",
         ),
     })
     .superRefine((data, ctx) => {
+      // Check logic for Auto generate checkbox and Employee Number PCC
+      if (data.employeeNumberPCC === "" && !data.autoGenerate) {
+        ctx.addIssue({
+          code: ZodIssueCode.custom,
+          message: "This field is required.",
+          path: ["employeeNumberPCC"],
+        });
+      }
+
       // Check if password matches confirm password
       if (data.password !== data.confirm_password) {
         ctx.addIssue({
@@ -303,117 +355,33 @@ export const NewSchemaAddEmployee = (
           path: ["confirm_password"],
         });
       }
-
-      // Check if both assign head and division are true
-      if (data.isDepartmentHead && data.isDivisionHead) {
-        ctx.addIssue({
-          code: ZodIssueCode.custom,
-          message:
-            "User cannot be a department head and division head simultaneously.",
-          path: ["department"],
-        });
-      }
-
-      // Check if bachelor year end status is not specified
-      if (data.bachelor_end === "" && !data.bachelor_studying) {
-        ctx.addIssue({
-          code: ZodIssueCode.custom,
-          message: "This field is required.",
-          path: ["bachelor_end"],
-        });
-      }
-
-      // Check if masteral year end status is not specified
-      if (
-        educationLevelStatus.masteral &&
-        data.masteral_end === "" &&
-        !data.masteral_studying
-      ) {
-        ctx.addIssue({
-          code: ZodIssueCode.custom,
-          message: "This field is required.",
-          path: ["masteral_end"],
-        });
-      }
-
-      // Check if doctorate year end status is not specified
-      if (
-        educationLevelStatus.doctorate &&
-        data.doctorate_end === "" &&
-        !data.doctorate_studying
-      ) {
-        ctx.addIssue({
-          code: ZodIssueCode.custom,
-          message: "This field is required.",
-          path: ["doctorate_end"],
-        });
-      }
-
-      // Check if bachelor start is greater than bachelor end
-      if (!data.bachelor_studying) {
-        if (data.bachelor_end && data.bachelor_end < data.bachelor_start) {
-          ctx.addIssue({
-            code: ZodIssueCode.custom,
-            message: "End year cannot be lower than start year.",
-            path: ["bachelor_end"],
-          });
-        }
-      }
-
-      // Check if masteral start is less than bachelor end
-      if (
-        data.bachelor_end &&
-        data.masteral_start &&
-        data.masteral_start < data.bachelor_end
-      ) {
-        ctx.addIssue({
-          code: ZodIssueCode.custom,
-          message: "Start year cannot be less than bachelor end year.",
-          path: ["masteral_start"],
-        });
-      }
-
-      // Check if masteral start is greater than masteral end
-      if (
-        data.masteral_start &&
-        data.masteral_end &&
-        data.masteral_end < data.masteral_start
-      ) {
-        ctx.addIssue({
-          code: ZodIssueCode.custom,
-          message: "End year cannot be lower than start year.",
-          path: ["masteral_end"],
-        });
-      }
-
-      // Check if doctorate start is less than masteral end
-      if (
-        data.masteral_end &&
-        data.doctorate_start &&
-        data.doctorate_start < data.masteral_end
-      ) {
-        ctx.addIssue({
-          code: ZodIssueCode.custom,
-          message: "Start year cannot be less than bachelor end year.",
-          path: ["doctorate_start"],
-        });
-      }
-
-      // Check if doctorate start is greater than doctorate end
-      if (
-        data.doctorate_start &&
-        data.doctorate_end &&
-        data.doctorate_end < data.doctorate_start
-      ) {
-        ctx.addIssue({
-          code: ZodIssueCode.custom,
-          message: "End year cannot be lower than start year.",
-          path: ["doctorate_end"],
-        });
-      }
     });
 };
 
 export type NewSchemaAddEmployeeType = z.infer<
   ReturnType<typeof NewSchemaAddEmployee>
 >;
+
+// const formSchema = z.object({
+//   textbox: z
+//     .string()
+//     .transform((value) => {
+//       return value === "" ? null : value;
+//     })
+//     .superRefine((value, ctx) => {
+//       if (value === null) {
+
+//       }
+//     }),
+// });
+
+// const formData = {
+//   textbox: null,
+// };
+
+// try {
+//   const result = formSchema.parse(formData);
+//   console.log(result);
+// } catch (error: any) {
+//   console.error(error.errors);
+// }
